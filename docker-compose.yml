@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: oil-sales-app-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: oil-sales-app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    # Host 5433 avoids conflict when another PostgreSQL already uses 5432 on your machine.
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: oil-sales-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      DB_NAME: oil-sales-app
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_EXPIRES_IN: 24h
+      NODE_ENV: development
+      PORT: 3000
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

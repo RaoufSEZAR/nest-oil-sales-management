@@ -1,0 +1,34 @@
+import { Center } from "src/centers/entities/center.entity";
+import { User } from "src/users/entities/user.entity";
+import { PurchaseItem } from "src/erp/entities/purchase-item.entity";
+import { PurchaseDistribution } from "src/erp/entities/purchase-distribution.entity";
+import { TradeCurrency } from "src/erp/enums/trade-currency.enum";
+import { PurchasePaymentStatus } from "src/erp/enums/purchase-payment-status.enum";
+import { PurchaseReceiptStatus } from "src/erp/enums/purchase-receipt-status.enum";
+export declare class Purchase {
+    id: number;
+    purchaseNumber: string;
+    center?: Center | null;
+    supplierName: string;
+    supplierPhone?: string | null;
+    date: string;
+    totalAmount: string;
+    paidAmount: string;
+    currency: TradeCurrency;
+    exchangeRate: string;
+    amountUsd: string;
+    paymentStatus: PurchasePaymentStatus;
+    receiptStatus: PurchaseReceiptStatus;
+    confirmedBy?: User | null;
+    confirmedAt?: Date | null;
+    createdBy: User;
+    purchaseType: string;
+    customsCost: string;
+    shippingCost: string;
+    distributionStatus?: string | null;
+    notes?: string | null;
+    items: PurchaseItem[];
+    distributions: PurchaseDistribution[];
+    createdAt: Date;
+    updatedAt: Date;
+}
