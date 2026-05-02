@@ -10,6 +10,7 @@ exports.CentersModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const center_entity_1 = require("./entities/center.entity");
+const sub_center_request_entity_1 = require("./entities/sub-center-request.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const vehicle_entity_1 = require("../vehicles/entities/vehicle.entity");
 const centers_service_1 = require("./centers.service");
@@ -19,7 +20,7 @@ let CentersModule = class CentersModule {
 exports.CentersModule = CentersModule;
 exports.CentersModule = CentersModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([center_entity_1.Center, user_entity_1.User, vehicle_entity_1.Vehicle])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([center_entity_1.Center, sub_center_request_entity_1.SubCenterRequest, user_entity_1.User, vehicle_entity_1.Vehicle])],
         controllers: [centers_controller_1.CentersController],
         providers: [centers_service_1.CentersService],
         exports: [centers_service_1.CentersService],

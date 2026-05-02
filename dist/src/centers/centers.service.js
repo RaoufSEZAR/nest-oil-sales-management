@@ -17,11 +17,15 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const center_entity_1 = require("./entities/center.entity");
+const sub_center_request_entity_1 = require("./entities/sub-center-request.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const center_type_enum_1 = require("./enums/center-type.enum");
+const sub_center_request_status_enum_1 = require("./enums/sub-center-request-status.enum");
+const user_role_enum_1 = require("../users/enums/user-role.enum");
 let CentersService = class CentersService {
-    constructor(centersRepo, usersRepo) {
+    constructor(centersRepo, subCenterRequestsRepo, usersRepo) {
         this.centersRepo = centersRepo;
+        this.subCenterRequestsRepo = subCenterRequestsRepo;
         this.usersRepo = usersRepo;
     }
     stripPasswordsFromUsers(center) {
@@ -76,6 +80,76 @@ let CentersService = class CentersService {
         this.stripManagerPassword(center);
         this.stripPasswordsFromUsers(center);
         return center;
+    }
+    async createSubCenterRequest(userId, dto) {
+        const user = await this.usersRepo.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new common_1.UnauthorizedException("User not found");
+        }
+        const row = this.subCenterRequestsRepo.create({
+            requestedName: dto.centerName.trim(),
+            location: dto.location?.trim() || null,
+            notes: dto.notes?.trim() || null,
+            requestedByUserId: userId,
+            requestedFromCenterId: user.centerId ?? null,
+            status: sub_center_request_status_enum_1.SubCenterRequestStatus.PENDING,
+        });
+        return this.subCenterRequestsRepo.save(row);
+    }
+    async allocateUniqueBranchCode(nameSeed) {
+        const slug = nameSeed
+            .replace(/[^a-zA-Z0-9]/g, "")
+            .toUpperCase()
+            .slice(0, 6);
+        const prefix = (slug.length ? slug : "BR").slice(0, 6);
+        for (let attempt = 0; attempt < 40; attempt++) {
+            const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const ts = Date.now().toString(36).toUpperCase().slice(-3);
+            const candidate = `${prefix}-${ts}${rand}`.slice(0, 20);
+            const exists = await this.centersRepo.exist({
+                where: { code: candidate },
+            });
+            if (!exists)
+                return candidate;
+        }
+        throw new common_1.ConflictException("Could not allocate a unique center code");
+    }
+    async createQuickBranch(userId, dto) {
+        const user = await this.usersRepo.findOne({ where: { id: userId } });
+        if (!user) {
+            throw new common_1.UnauthorizedException("User not found");
+        }
+        if (user.role === user_role_enum_1.UserRole.MANAGER) {
+            if (user.centerId == null) {
+                throw new common_1.BadRequestException("Manager must be assigned to a center to add a branch");
+            }
+        }
+        else if (user.role !== user_role_enum_1.UserRole.ADMIN &&
+            user.role !== user_role_enum_1.UserRole.SUPER_ADMIN) {
+            throw new common_1.ForbiddenException("Not allowed to create a branch");
+        }
+        const name = dto.centerName.trim();
+        if (!name.length) {
+            throw new common_1.BadRequestException("Center name is required");
+        }
+        let parentCenterId = null;
+        if (user.role === user_role_enum_1.UserRole.MANAGER) {
+            parentCenterId = user.centerId;
+        }
+        else {
+            parentCenterId = user.centerId ?? null;
+        }
+        const addressParts = [dto.location?.trim(), dto.notes?.trim()].filter((s) => !!s && s.length > 0);
+        const address = addressParts.length ? addressParts.join("\n\n") : null;
+        const code = await this.allocateUniqueBranchCode(name);
+        return this.create({
+            name,
+            code,
+            centerType: center_type_enum_1.CenterType.BRANCH,
+            isIndependent: false,
+            address: address ?? undefined,
+            parentCenterId: parentCenterId ?? undefined,
+        });
     }
     async create(dto) {
         const dup = await this.centersRepo.findOne({
@@ -165,8 +239,10 @@ exports.CentersService = CentersService;
 exports.CentersService = CentersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(center_entity_1.Center)),
-    __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(1, (0, typeorm_1.InjectRepository)(sub_center_request_entity_1.SubCenterRequest)),
+    __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository])
 ], CentersService);
 //# sourceMappingURL=centers.service.js.map
