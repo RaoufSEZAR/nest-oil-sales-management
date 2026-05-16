@@ -7,20 +7,22 @@ import { setupSwagger } from "src/swagger/setup-swagger";
 
 function disableHttpCacheForDocs(app: INestApplication) {
 	const instance = app.getHttpAdapter().getInstance() as {
-		use?: (path: string | string[], ...handlers: unknown[]) => void;
+		use?: (handler: (req: Request, res: Response, next: NextFunction) => void) => void;
 	};
-	if (typeof instance?.use === "function") {
-		const noCache = (_req: Request, res: Response, next: NextFunction) => {
+	if (typeof instance?.use !== "function") return;
+
+	instance.use((req: Request, res: Response, next: NextFunction) => {
+		const path = req.path ?? "";
+		if (path === "/docs" || path.startsWith("/docs/") || path === "/docs-json" || path === "/docs-yaml") {
 			res.setHeader(
 				"Cache-Control",
 				"no-store, no-cache, must-revalidate, proxy-revalidate",
 			);
 			res.setHeader("Pragma", "no-cache");
 			res.setHeader("Expires", "0");
-			next();
-		};
-		instance.use(["/docs", "/docs-json", "/docs-yaml"], noCache);
-	}
+		}
+		next();
+	});
 }
 
 async function bootstrap() {

@@ -18,8 +18,9 @@ import {
 	CreateInventoryTransferDto,
 	UpdateInventoryTransferDto,
 } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Inventory transfers")
+@ApiTags(SwaggerTags.ErpInventoryTransfers)
 @Controller("inventory-transfers")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

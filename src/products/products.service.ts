@@ -9,6 +9,7 @@ import { Repository } from "typeorm";
 import { Product } from "src/products/entities/product.entity";
 import { CreateProductDto } from "src/products/dto/create-product.dto";
 import { UpdateProductDto } from "src/products/dto/update-product.dto";
+import { BulkUpsertProductsResultDto } from "src/products/dto/bulk-upsert-result.dto";
 
 export interface ProductsListResult {
 	products: Product[];
@@ -86,16 +87,80 @@ export class ProductsService {
 		if (existing) {
 			throw new ConflictException("Product SKU already exists");
 		}
-		const product = this.productsRepo.create({
+		const product = this.productsRepo.create(this.dtoToEntity(dto));
+		return this.productsRepo.save(product);
+	}
+
+	async bulkUpsert(
+		items: CreateProductDto[],
+		updateExisting = true,
+	): Promise<BulkUpsertProductsResultDto> {
+		if (!items.length) {
+			throw new BadRequestException("products array must not be empty");
+		}
+
+		const result: BulkUpsertProductsResultDto = {
+			created: 0,
+			updated: 0,
+			skipped: 0,
+			total: items.length,
+			errors: [],
+		};
+
+		for (const dto of items) {
+			try {
+				const existing = await this.productsRepo.findOne({
+					where: { sku: dto.sku },
+				});
+				if (existing) {
+					if (!updateExisting) {
+						result.skipped++;
+						continue;
+					}
+					this.applyDto(existing, dto);
+					existing.active = true;
+					await this.productsRepo.save(existing);
+					result.updated++;
+				} else {
+					const product = this.productsRepo.create(this.dtoToEntity(dto));
+					await this.productsRepo.save(product);
+					result.created++;
+				}
+			} catch (err: unknown) {
+				const message =
+					err instanceof Error ? err.message : "Unknown error";
+				result.errors.push({ sku: dto.sku, message });
+			}
+		}
+
+		return result;
+	}
+
+	private dtoToEntity(dto: CreateProductDto): Partial<Product> {
+		return {
 			name: dto.name,
 			sku: dto.sku,
 			category: dto.category ?? null,
 			unit: dto.unit ?? "قطعة",
 			price: dto.price.toFixed(2),
-			cost: dto.cost != null ? dto.cost.toFixed(2) : null,
+			cost:
+				dto.cost != null && !Number.isNaN(dto.cost)
+					? dto.cost.toFixed(2)
+					: null,
 			active: true,
-		});
-		return this.productsRepo.save(product);
+		};
+	}
+
+	private applyDto(product: Product, dto: CreateProductDto): void {
+		product.name = dto.name;
+		product.sku = dto.sku;
+		product.category = dto.category ?? null;
+		product.unit = dto.unit ?? "قطعة";
+		product.price = dto.price.toFixed(2);
+		product.cost =
+			dto.cost != null && !Number.isNaN(dto.cost)
+				? dto.cost.toFixed(2)
+				: null;
 	}
 
 	async update(id: number, dto: UpdateProductDto): Promise<Product> {

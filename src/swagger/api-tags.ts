@@ -1,0 +1,22 @@
+/**
+ * URL-safe Swagger tag ids (no spaces). Swagger UI encodes spaces in hash links as `_`,
+ * which triggers deprecation warnings and can break deep links.
+ */
+export const SwaggerTags = {
+	Health: "Health",
+	Authentication: "Authentication",
+	Users: "Users",
+	Centers: "Centers",
+	Vehicles: "Vehicles",
+	Products: "Products",
+	ErpCustomers: "ERP-Customers",
+	ErpInvoices: "ERP-Invoices",
+	ErpSalesReturns: "ERP-Sales-returns",
+	ErpPayments: "ERP-Payments",
+	ErpVehicleTrips: "ERP-Vehicle-trips",
+	ErpExpenses: "ERP-Expenses",
+	ErpPurchases: "ERP-Purchases",
+	ErpCurrencyExchanges: "ERP-Currency-exchanges",
+	ErpInventoryTransfers: "ERP-Inventory-transfers",
+	ErpCashHandovers: "ERP-Cash-handovers",
+} as const;

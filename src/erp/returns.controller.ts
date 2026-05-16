@@ -14,8 +14,9 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { UserRole } from "src/users/enums/user-role.enum";
 import { ErpReturnsService } from "src/erp/returns.service";
 import { CreateSalesReturnDto } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Sales returns")
+@ApiTags(SwaggerTags.ErpSalesReturns)
 @Controller("returns")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

@@ -18,8 +18,9 @@ import {
 	CreateCashHandoverDto,
 	UpdateCashHandoverDto,
 } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Cash handovers")
+@ApiTags(SwaggerTags.ErpCashHandovers)
 @Controller("cash-handovers")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

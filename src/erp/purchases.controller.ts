@@ -19,8 +19,9 @@ import {
 	CreatePurchaseDistributionDto,
 	UpdatePurchaseDto,
 } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Purchases")
+@ApiTags(SwaggerTags.ErpPurchases)
 @Controller("purchases")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

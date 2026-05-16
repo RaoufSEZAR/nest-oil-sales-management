@@ -14,8 +14,9 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { UserRole } from "src/users/enums/user-role.enum";
 import { ErpCurrencyExchangesService } from "src/erp/currency-exchanges.service";
 import { CreateCurrencyExchangeDto } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Currency exchanges")
+@ApiTags(SwaggerTags.ErpCurrencyExchanges)
 @Controller("currency-exchanges")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

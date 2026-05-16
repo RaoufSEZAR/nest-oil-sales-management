@@ -15,10 +15,19 @@ import {
 	ApiOperation,
 	ApiBearerAuth,
 	ApiQuery,
+	ApiBody,
+	ApiOkResponse,
+	ApiBadRequestResponse,
+	ApiForbiddenResponse,
+	ApiConflictResponse,
 } from "@nestjs/swagger";
 import { ProductsService } from "src/products/products.service";
 import { CreateProductDto } from "src/products/dto/create-product.dto";
 import { UpdateProductDto } from "src/products/dto/update-product.dto";
+import { BulkUpsertProductsDto } from "src/products/dto/bulk-upsert-products.dto";
+import { BulkUpsertProductsResultDto } from "src/products/dto/bulk-upsert-result.dto";
+import { OIL_CATALOG_PRODUCTS } from "src/products/data/oil-catalog.seed";
+import { Product } from "src/products/entities/product.entity";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
@@ -67,18 +76,75 @@ export class ProductsController {
 		});
 	}
 
-	@Get(":id")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
-	@ApiOperation({ summary: "Get product by id with inventory rows" })
-	findOne(@Param("id", ParseIntPipe) id: number) {
-		return this.productsService.findOne(id);
+	@Post("bulk")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({
+		summary: "Bulk create or update products by SKU (admin)",
+		description:
+			"Upserts each item in `products` by unique `sku`. Set `updateExisting` to false to skip existing SKUs instead of updating them.",
+	})
+	@ApiBody({ type: BulkUpsertProductsDto })
+	@ApiOkResponse({
+		type: BulkUpsertProductsResultDto,
+		description: "Counts of created, updated, skipped rows and per-SKU errors",
+	})
+	@ApiBadRequestResponse({ description: "Validation error or empty products array" })
+	@ApiForbiddenResponse({ description: "Admin role required" })
+	bulkUpsert(@Body() dto: BulkUpsertProductsDto): Promise<BulkUpsertProductsResultDto> {
+		return this.productsService.bulkUpsert(
+			dto.products,
+			dto.updateExisting !== false,
+		);
+	}
+
+	@Post("seed/oil-catalog")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({
+		summary: "Import default oil catalog (40 products) in one click",
+		description:
+			"No request body. Loads the built-in Vollmax / Nytron / other oil SKUs and upserts by SKU. Safe to run multiple times when `updateExisting` is true (default).",
+	})
+	@ApiQuery({
+		name: "updateExisting",
+		required: false,
+		type: Boolean,
+		description: "Update rows when SKU already exists (default true)",
+	})
+	@ApiOkResponse({
+		type: BulkUpsertProductsResultDto,
+		description: "Import summary (created / updated / skipped / errors)",
+	})
+	@ApiForbiddenResponse({ description: "Admin role required" })
+	seedOilCatalog(
+		@Query("updateExisting") updateExistingRaw?: string,
+	): Promise<BulkUpsertProductsResultDto> {
+		const updateExisting =
+			updateExistingRaw === undefined ||
+			updateExistingRaw === "true" ||
+			updateExistingRaw === "1";
+		return this.productsService.bulkUpsert(
+			OIL_CATALOG_PRODUCTS,
+			updateExisting,
+		);
 	}
 
 	@Post()
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
 	@ApiOperation({ summary: "Create product" })
+	@ApiBody({ type: CreateProductDto })
+	@ApiOkResponse({ type: Product })
+	@ApiConflictResponse({ description: "SKU already exists" })
+	@ApiForbiddenResponse({ description: "Admin role required" })
 	create(@Body() dto: CreateProductDto) {
 		return this.productsService.create(dto);
+	}
+
+	@Get(":id")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
+	@ApiOperation({ summary: "Get product by id with inventory rows" })
+	@ApiOkResponse({ type: Product })
+	findOne(@Param("id", ParseIntPipe) id: number) {
+		return this.productsService.findOne(id);
 	}
 
 	@Patch(":id")

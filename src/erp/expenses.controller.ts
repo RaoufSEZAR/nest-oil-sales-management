@@ -14,8 +14,9 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { UserRole } from "src/users/enums/user-role.enum";
 import { ErpExpensesService } from "src/erp/expenses.service";
 import { CreateExpenseDto } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Expenses")
+@ApiTags(SwaggerTags.ErpExpenses)
 @Controller("expenses")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

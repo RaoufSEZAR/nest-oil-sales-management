@@ -14,8 +14,9 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { UserRole } from "src/users/enums/user-role.enum";
 import { ErpPaymentsService } from "src/erp/payments.service";
 import { CreatePaymentDto } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Payments")
+@ApiTags(SwaggerTags.ErpPayments)
 @Controller("payments")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

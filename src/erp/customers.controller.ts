@@ -15,8 +15,9 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { UserRole } from "src/users/enums/user-role.enum";
 import { ErpCustomersService } from "src/erp/customers.service";
 import { CreateCustomerDto, UpdateCustomerDto } from "src/erp/dto/customer.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Customers")
+@ApiTags(SwaggerTags.ErpCustomers)
 @Controller("customers")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

@@ -18,8 +18,9 @@ import {
 	CreateVehicleTripDto,
 	UpdateVehicleTripDto,
 } from "src/erp/dto/documents.dto";
+import { SwaggerTags } from "src/swagger/api-tags";
 
-@ApiTags("ERP — Vehicle trips")
+@ApiTags(SwaggerTags.ErpVehicleTrips)
 @Controller("vehicle-trips")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
