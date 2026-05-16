@@ -12,6 +12,7 @@ import {
 import { SequenceService } from "src/erp/sequence.service";
 import { TradeCurrency } from "src/erp/enums/trade-currency.enum";
 import { User } from "src/users/entities/user.entity";
+import { ProductsService } from "src/products/products.service";
 
 function dec4(n: number): string {
 	return n.toFixed(4);
@@ -26,6 +27,7 @@ export class ErpPurchasesService {
 		private readonly distributions: Repository<PurchaseDistribution>,
 		private readonly dataSource: DataSource,
 		private readonly sequences: SequenceService,
+		private readonly productsService: ProductsService,
 	) {}
 
 	findAll(): Promise<Purchase[]> {
@@ -100,6 +102,13 @@ export class ErpPurchasesService {
 					totalUsd: dec4(lineTotal),
 				});
 				await em.save(item);
+				if (line.productId) {
+					await this.productsService.increaseStock(
+						line.productId,
+						line.quantity,
+						em,
+					);
+				}
 			}
 
 			return em.findOneOrFail(Purchase, {
@@ -139,6 +148,8 @@ export class ErpPurchasesService {
 				: undefined,
 			notes: dto.notes ?? null,
 		});
-		return this.distributions.save(entity);
+		const saved = await this.distributions.save(entity);
+		await this.productsService.decreaseStock(dto.productId, dto.quantity);
+		return saved;
 	}
 }

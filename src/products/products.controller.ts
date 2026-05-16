@@ -26,6 +26,7 @@ import { CreateProductDto } from "src/products/dto/create-product.dto";
 import { UpdateProductDto } from "src/products/dto/update-product.dto";
 import { BulkUpsertProductsDto } from "src/products/dto/bulk-upsert-products.dto";
 import { BulkUpsertProductsResultDto } from "src/products/dto/bulk-upsert-result.dto";
+import { AdjustProductStockDto } from "src/products/dto/adjust-product-stock.dto";
 import { OIL_CATALOG_PRODUCTS } from "src/products/data/oil-catalog.seed";
 import { Product } from "src/products/entities/product.entity";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
@@ -145,6 +146,30 @@ export class ProductsController {
 	@ApiOkResponse({ type: Product })
 	findOne(@Param("id", ParseIntPipe) id: number) {
 		return this.productsService.findOne(id);
+	}
+
+	@Patch(":id/stock/increase")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Increase product stock" })
+	@ApiBody({ type: AdjustProductStockDto })
+	@ApiOkResponse({ type: Product })
+	increaseStock(
+		@Param("id", ParseIntPipe) id: number,
+		@Body() dto: AdjustProductStockDto,
+	) {
+		return this.productsService.increaseStock(id, dto.quantity);
+	}
+
+	@Patch(":id/stock/decrease")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Decrease product stock" })
+	@ApiBody({ type: AdjustProductStockDto })
+	@ApiOkResponse({ type: Product })
+	decreaseStock(
+		@Param("id", ParseIntPipe) id: number,
+		@Body() dto: AdjustProductStockDto,
+	) {
+		return this.productsService.decreaseStock(id, dto.quantity);
 	}
 
 	@Patch(":id")

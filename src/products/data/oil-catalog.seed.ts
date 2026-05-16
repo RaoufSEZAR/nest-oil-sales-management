@@ -1,7 +1,8 @@
 import { CreateProductDto } from "src/products/dto/create-product.dto";
 
-/** Default oil product catalog — upserted by POST /products/seed/oil-catalog */
-export const OIL_CATALOG_PRODUCTS: CreateProductDto[] = [
+type OilCatalogRow = Omit<CreateProductDto, "stock">;
+
+const OIL_CATALOG_ROWS: OilCatalogRow[] = [
 	{ name: "0/20 4 لتر تنك", sku: "DATA-efccdc62fe02c266", category: "زيوت فولماكس (Vollmax Oils)", unit: "4 لتر", price: 15 },
 	{ name: "10/30 SL فول ماكس 4 لتر علبة/عبوة", sku: "DATA-931f786caee85763", category: "زيوت فولماكس (Vollmax Oils)", unit: "4 لتر", price: 13 },
 	{ name: "10/40 4 لتر تنك", sku: "DATA-23b4cc20a3cbab0e", category: "زيوت فولماكس (Vollmax Oils)", unit: "4 لتر", price: 15 },
@@ -43,3 +44,8 @@ export const OIL_CATALOG_PRODUCTS: CreateProductDto[] = [
 	{ name: "زيت متور 2T 1 لتر علبة/عبوة", sku: "DATA-a63e191c4419a6dc", category: "زيوت فولماكس (Vollmax Oils)", unit: "1 لتر", price: 3.33 },
 	{ name: "زيت هيدروليك عيار 46 HL 1 لتر علبة/عبوة", sku: "DATA-eaaede99d8dcfd2a", category: "زيوت فولماكس (Vollmax Oils)", unit: "1 لتر", price: 2.75 },
 ];
+
+/** Default oil product catalog — upserted by POST /products/seed/oil-catalog */
+export const OIL_CATALOG_PRODUCTS: CreateProductDto[] = OIL_CATALOG_ROWS.map(
+	(row) => ({ ...row, stock: 0 }),
+);

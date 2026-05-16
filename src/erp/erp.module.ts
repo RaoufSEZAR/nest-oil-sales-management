@@ -37,6 +37,7 @@ import { ErpInventoryTransfersService } from "src/erp/inventory-transfers.servic
 import { ErpInventoryTransfersController } from "src/erp/inventory-transfers.controller";
 import { ErpCashHandoversService } from "src/erp/cash-handovers.service";
 import { ErpCashHandoversController } from "src/erp/cash-handovers.controller";
+import { ProductsModule } from "src/products/products.module";
 
 const erpEntities = [
 	Sequence,
@@ -58,7 +59,7 @@ const erpEntities = [
 ];
 
 @Module({
-	imports: [TypeOrmModule.forFeature(erpEntities)],
+	imports: [TypeOrmModule.forFeature(erpEntities), ProductsModule],
 	controllers: [
 		ErpCustomersController,
 		ErpInvoicesController,

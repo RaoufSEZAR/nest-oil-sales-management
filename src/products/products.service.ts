@@ -5,7 +5,7 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { EntityManager, Repository } from "typeorm";
 import { Product } from "src/products/entities/product.entity";
 import { CreateProductDto } from "src/products/dto/create-product.dto";
 import { UpdateProductDto } from "src/products/dto/update-product.dto";
@@ -19,6 +19,14 @@ export interface ProductsListResult {
 		limit: number;
 		pages: number;
 	};
+}
+
+function dec2(n: number): string {
+	return n.toFixed(2);
+}
+
+function parseStock(value: string | null | undefined): number {
+	return Number.parseFloat(value ?? "0") || 0;
 }
 
 @Injectable()
@@ -136,16 +144,79 @@ export class ProductsService {
 		return result;
 	}
 
+	/** Increase stock (purchases, returns, manual adjustment). */
+	async increaseStock(
+		productId: number,
+		quantity: number,
+		em?: EntityManager,
+	): Promise<Product> {
+		if (quantity <= 0) {
+			throw new BadRequestException("quantity must be greater than 0");
+		}
+		return this.applyStockDelta(productId, quantity, em);
+	}
+
+	/** Decrease stock (sales, distributions, manual adjustment). */
+	async decreaseStock(
+		productId: number,
+		quantity: number,
+		em?: EntityManager,
+	): Promise<Product> {
+		if (quantity <= 0) {
+			throw new BadRequestException("quantity must be greater than 0");
+		}
+		return this.applyStockDelta(productId, -quantity, em);
+	}
+
+	async applyStockDelta(
+		productId: number,
+		delta: number,
+		em?: EntityManager,
+	): Promise<Product> {
+		if (!Number.isFinite(delta) || delta === 0) {
+			throw new BadRequestException("Invalid stock delta");
+		}
+
+		const manager = em ?? this.productsRepo.manager;
+
+		const apply = async (tx: EntityManager) => {
+			const product = await tx.findOne(Product, {
+				where: { id: productId },
+				lock: { mode: "pessimistic_write" },
+			});
+			if (!product) {
+				throw new NotFoundException(`Product ${productId} not found`);
+			}
+
+			const next = parseStock(product.stock) + delta;
+			if (next < 0) {
+				throw new BadRequestException(
+					`Insufficient stock for product ${productId} (${product.name}). Available: ${parseStock(product.stock)}, requested: ${Math.abs(delta)}`,
+				);
+			}
+
+			product.stock = dec2(next);
+			return tx.save(product);
+		};
+
+		if (em) {
+			return apply(em);
+		}
+
+		return manager.transaction((tx) => apply(tx));
+	}
+
 	private dtoToEntity(dto: CreateProductDto): Partial<Product> {
 		return {
 			name: dto.name,
 			sku: dto.sku,
 			category: dto.category ?? null,
 			unit: dto.unit ?? "قطعة",
-			price: dto.price.toFixed(2),
+			price: dec2(dto.price),
+			stock: dec2(dto.stock),
 			cost:
 				dto.cost != null && !Number.isNaN(dto.cost)
-					? dto.cost.toFixed(2)
+					? dec2(dto.cost)
 					: null,
 			active: true,
 		};
@@ -156,10 +227,11 @@ export class ProductsService {
 		product.sku = dto.sku;
 		product.category = dto.category ?? null;
 		product.unit = dto.unit ?? "قطعة";
-		product.price = dto.price.toFixed(2);
+		product.price = dec2(dto.price);
+		product.stock = dec2(dto.stock);
 		product.cost =
 			dto.cost != null && !Number.isNaN(dto.cost)
-				? dto.cost.toFixed(2)
+				? dec2(dto.cost)
 				: null;
 	}
 
@@ -181,11 +253,12 @@ export class ProductsService {
 		if (dto.sku !== undefined) product.sku = dto.sku;
 		if (dto.category !== undefined) product.category = dto.category;
 		if (dto.unit !== undefined) product.unit = dto.unit;
-		if (dto.price !== undefined) product.price = dto.price.toFixed(2);
+		if (dto.price !== undefined) product.price = dec2(dto.price);
+		if (dto.stock !== undefined) product.stock = dec2(dto.stock);
 		if (dto.cost !== undefined) {
 			product.cost =
 				dto.cost != null && !Number.isNaN(dto.cost)
-					? dto.cost.toFixed(2)
+					? dec2(dto.cost)
 					: null;
 		}
 		if (dto.active !== undefined) product.active = dto.active;

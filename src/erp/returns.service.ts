@@ -7,6 +7,7 @@ import { CreateSalesReturnDto } from "src/erp/dto/documents.dto";
 import { SequenceService } from "src/erp/sequence.service";
 import { ReturnItemCondition } from "src/erp/enums/return-item-condition.enum";
 import { User } from "src/users/entities/user.entity";
+import { ProductsService } from "src/products/products.service";
 
 function dec2(n: number): string {
 	return n.toFixed(2);
@@ -23,6 +24,7 @@ export class ErpReturnsService {
 		private readonly returns: Repository<SalesReturn>,
 		private readonly dataSource: DataSource,
 		private readonly sequences: SequenceService,
+		private readonly productsService: ProductsService,
 	) {}
 
 	findAll(): Promise<SalesReturn[]> {
@@ -87,6 +89,11 @@ export class ErpReturnsService {
 					reasonDetail: line.reasonDetail ?? null,
 				});
 				await em.save(item);
+				await this.productsService.increaseStock(
+					line.productId,
+					line.quantity,
+					em,
+				);
 			}
 
 			return em.findOneOrFail(SalesReturn, {

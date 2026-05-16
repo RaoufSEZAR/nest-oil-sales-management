@@ -8,6 +8,7 @@ import { SequenceService } from "src/erp/sequence.service";
 import { TradeCurrency } from "src/erp/enums/trade-currency.enum";
 import { InvoicePaymentStatus } from "src/erp/enums/invoice-payment-status.enum";
 import { User } from "src/users/entities/user.entity";
+import { ProductsService } from "src/products/products.service";
 
 function dec2(n: number): string {
 	return n.toFixed(2);
@@ -20,6 +21,7 @@ export class ErpInvoicesService {
 		private readonly invoices: Repository<Invoice>,
 		private readonly dataSource: DataSource,
 		private readonly sequences: SequenceService,
+		private readonly productsService: ProductsService,
 	) {}
 
 	findAll(): Promise<Invoice[]> {
@@ -96,6 +98,11 @@ export class ErpInvoicesService {
 					total: dec2(lineTotal),
 				});
 				await em.save(item);
+				await this.productsService.decreaseStock(
+					line.productId,
+					line.quantity,
+					em,
+				);
 			}
 
 			return em.findOneOrFail(Invoice, {
