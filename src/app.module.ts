@@ -20,7 +20,10 @@ import { APP_GUARD } from "@nestjs/core";
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
-			envFilePath: "config.env",
+			envFilePath:
+				process.env.NODE_ENV === "production"
+					? ["production.env", "config.env"]
+					: "config.env",
 		}),
 		ThrottlerModule.forRoot([
 			{

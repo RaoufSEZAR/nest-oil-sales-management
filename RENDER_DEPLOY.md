@@ -11,17 +11,14 @@ This guide deploys the **Oil Sales** backend (`BK/`) on [Render](https://render.
 | **PostgreSQL** | Production database |
 | **Web Service (Docker)** | NestJS API (`BK/Dockerfile`) |
 
-Public API base URL (after deploy):
+Public API (deployed):
 
-```text
-https://<your-service-name>.onrender.com/api/v1
-```
-
-Swagger (if enabled):
-
-```text
-https://<your-service-name>.onrender.com/docs
-```
+| Resource | URL |
+|----------|-----|
+| **API base** | `https://nest-oil-sales-management.onrender.com/api/v1` |
+| **Health** | `https://nest-oil-sales-management.onrender.com/api/v1/health` |
+| **Swagger** | `https://nest-oil-sales-management.onrender.com/docs` |
+| **Root** | `https://nest-oil-sales-management.onrender.com/` |
 
 ---
 
@@ -171,6 +168,7 @@ pg_dump -h localhost -p 5433 -U postgres -d oil-sales-app --no-owner --no-acl | 
 
 - Do **not** rely on uploading `config.env` with production secrets.
 - Keep `config.env` for local development only, or remove secrets from it before pushing.
+- For production, copy from `production.env` (gitignored) or `production.env.example` → `production.env`.
 
 ---
 
@@ -224,11 +222,13 @@ Expected: `Oil Sales API is running!`
 
 Update manager / center / admin frontends:
 
+Each frontend uses `VITE_RESTAPI_URL` in `.env.production`:
+
 ```env
-VITE_API_BASE_URL=https://<your-service>.onrender.com/api/v1
+VITE_RESTAPI_URL=https://nest-oil-sales-management.onrender.com/api/v1
 ```
 
-(Exact variable name depends on each FE project; check `api.ts` / `.env.production`.)
+Already set in `manager-FE`, `center-FE`, and `user-FE`. Rebuild and redeploy each static site after changing.
 
 Enable **CORS** is already global in `main.ts` (`app.enableCors()`). For strict production, restrict origins in code later.
 
