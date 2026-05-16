@@ -42,7 +42,9 @@ import { APP_GUARD } from "@nestjs/core";
 				database: configService.get("DB_NAME"),
 				entities: [User, Center, Vehicle, Product, Inventory],
 				autoLoadEntities: true,
-				synchronize: configService.get("NODE_ENV") !== "production",
+				synchronize:
+					configService.get("DB_SYNCHRONIZE") === "true" ||
+					configService.get("NODE_ENV") !== "production",
 				logging: configService.get("NODE_ENV") === "development",
 				ssl:
 					configService.get("DB_SSL") === "true"

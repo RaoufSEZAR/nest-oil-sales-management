@@ -140,11 +140,14 @@ DB_USERNAME=oil_sales_db_user
 DB_PASSWORD=Cwjq8c1YE0CSsjDDX4iQ8M4Wuan7urSu
 DB_NAME=oil_sales_db
 DB_SSL=true
+DB_SYNCHRONIZE=true
 JWT_SECRET=<generate: openssl rand -base64 48>
 JWT_EXPIRES_IN=24h
 ```
 
 Do **not** commit `DB_PASSWORD` or `JWT_SECRET` to a public repo. Set them in the Render dashboard only.
+
+After the first successful deploy, set **`DB_SYNCHRONIZE=false`**.
 
 ### Connect from your PC (schema import / psql)
 
@@ -174,21 +177,38 @@ pg_dump -h localhost -p 5433 -U postgres -d oil-sales-app --no-owner --no-acl | 
 
 ## Step 4 — Database schema (important)
 
-In **production**, TypeORM **`synchronize` is disabled** (`NODE_ENV=production`):
+On first deploy, Render Postgres is **empty**. The API needs tables before startup (e.g. `expense_categories` seed on boot). Error **`42P01`** = relation does not exist.
 
-```ts
-synchronize: configService.get("NODE_ENV") !== "production"
+### First deploy: enable `DB_SYNCHRONIZE`
+
+Add to Render Web Service → **Environment**:
+
+```env
+DB_SYNCHRONIZE=true
 ```
 
-So tables are **not** created automatically on first deploy.
+TypeORM will create all tables on startup when this is `true` (even with `NODE_ENV=production`).
 
-### First-time schema options
+1. Deploy and confirm the service stays **Live** (`/api/v1/health` returns OK).
+2. Set **`DB_SYNCHRONIZE=false`** (or remove the variable) and redeploy so schema is not auto-altered on every restart.
 
-1. **Recommended:** Export schema/data from your local/dev database and import into Render Postgres (`pg_dump` / `psql`).
-2. **One-time bootstrap (careful):** Temporarily deploy with a staging DB and migrations (not included in this repo yet).
-3. **Not recommended for prod:** Running with `NODE_ENV=development` against production Postgres (would auto-sync schema but is unsafe).
+Also include in your env block:
 
-After schema exists, redeploy with `NODE_ENV=production`.
+```env
+DB_SYNCHRONIZE=true
+```
+
+(alongside `DB_HOST`, `DB_SSL`, etc.)
+
+### Alternative: import from local dev
+
+If you already have data locally:
+
+```bash
+pg_dump -h localhost -p 5433 -U postgres -d oil-sales-app --no-owner --no-acl | psql "postgresql://...@dpg-....oregon-postgres.render.com/oil_sales_db?sslmode=require"
+```
+
+Then keep `DB_SYNCHRONIZE=false`.
 
 ---
 
@@ -284,7 +304,7 @@ docker run --rm -p 3000:3000 \
 | `Access denied. Required roles: ...` | Redeploy latest image; ensure code includes `MANAGER` on ERP routes. |
 | DB connection timeout | `DB_SSL=true`, correct host/port, Postgres and Web Service in same region. |
 | App crashes on start | Logs for TypeORM/auth; missing `JWT_SECRET` or DB vars. |
-| Empty tables / 500 on ERP routes | Schema not migrated; see **Database schema**. |
+| `42P01` / crash on deploy / empty tables | Add `DB_SYNCHRONIZE=true`, redeploy, then set `false`; see **Step 4**. |
 | 502 on free tier | Cold start; wait 30–60s or upgrade plan. |
 | CORS errors from browser | API URL must include `/api/v1`; FE must use HTTPS in production. |
 
