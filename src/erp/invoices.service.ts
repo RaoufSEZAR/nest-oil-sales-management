@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Repository } from "typeorm";
+import { Between, DataSource, FindOptionsWhere, Repository } from "typeorm";
 import { Invoice } from "src/erp/entities/invoice.entity";
 import { InvoiceItem } from "src/erp/entities/invoice-item.entity";
 import { CreateInvoiceDto } from "src/erp/dto/documents.dto";
@@ -24,8 +24,26 @@ export class ErpInvoicesService {
 		private readonly productsService: ProductsService,
 	) {}
 
-	findAll(): Promise<Invoice[]> {
+	findAll(filters?: {
+		customer_id?: number;
+		sales_rep_id?: string;
+		from_date?: string;
+		to_date?: string;
+		payment_status?: InvoicePaymentStatus;
+	}): Promise<Invoice[]> {
+		const where: FindOptionsWhere<Invoice> = {};
+		if (filters?.customer_id) where.customer = { id: filters.customer_id };
+		if (filters?.sales_rep_id) where.salesRep = { id: filters.sales_rep_id };
+		if (filters?.payment_status) where.paymentStatus = filters.payment_status;
+		if (filters?.from_date && filters?.to_date) {
+			where.date = Between(
+				new Date(filters.from_date),
+				new Date(filters.to_date),
+			);
+		}
+
 		return this.invoices.find({
+			where,
 			order: { id: "DESC" },
 			relations: {
 				customer: true,
@@ -115,5 +133,28 @@ export class ErpInvoicesService {
 				},
 			});
 		});
+	}
+
+	async update(
+		id: number,
+		patch: {
+			paidAmount?: number;
+			paymentStatus?: InvoicePaymentStatus;
+			notes?: string;
+		},
+	): Promise<Invoice> {
+		const row = await this.findOne(id);
+		if (patch.paidAmount !== undefined)
+			row.paidAmount = dec2(patch.paidAmount);
+		if (patch.paymentStatus !== undefined)
+			row.paymentStatus = patch.paymentStatus;
+		if (patch.notes !== undefined) row.notes = patch.notes ?? null;
+		await this.invoices.save(row);
+		return this.findOne(id);
+	}
+
+	async remove(id: number): Promise<void> {
+		await this.findOne(id);
+		await this.invoices.delete(id);
 	}
 }

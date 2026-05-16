@@ -131,6 +131,11 @@ let UsersService = class UsersService {
             where: { email },
         });
     }
+    async findByPhoneNumber(phone) {
+        return this.usersRepository.findOne({
+            where: { phoneNumber: phone },
+        });
+    }
     async update(id, updateUserDto, options) {
         const user = await this.findOne(id);
         if (updateUserDto.email && updateUserDto.email !== user.email) {

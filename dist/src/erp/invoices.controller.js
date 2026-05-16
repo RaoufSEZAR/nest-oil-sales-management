@@ -16,6 +16,7 @@ exports.ErpInvoicesController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const invoice_payment_status_enum_1 = require("./enums/invoice-payment-status.enum");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
@@ -27,8 +28,14 @@ let ErpInvoicesController = class ErpInvoicesController {
     constructor(invoices) {
         this.invoices = invoices;
     }
-    findAll() {
-        return this.invoices.findAll();
+    findAll(customer_id, sales_rep_id, from_date, to_date, payment_status) {
+        return this.invoices.findAll({
+            customer_id: customer_id ? parseInt(customer_id, 10) : undefined,
+            sales_rep_id,
+            from_date,
+            to_date,
+            payment_status,
+        });
     }
     findOne(id) {
         return this.invoices.findOne(id);
@@ -36,15 +43,31 @@ let ErpInvoicesController = class ErpInvoicesController {
     create(dto) {
         return this.invoices.create(dto);
     }
+    update(id, body) {
+        return this.invoices.update(id, body);
+    }
+    remove(id) {
+        return this.invoices.remove(id);
+    }
 };
 exports.ErpInvoicesController = ErpInvoicesController;
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "List invoices with line items" }),
+    (0, swagger_1.ApiQuery)({ name: "customer_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "sales_rep_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "from_date", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "to_date", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "payment_status", required: false, enum: invoice_payment_status_enum_1.InvoicePaymentStatus }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/invoice.entity").Invoice] }),
+    __param(0, (0, common_1.Query)("customer_id")),
+    __param(1, (0, common_1.Query)("sales_rep_id")),
+    __param(2, (0, common_1.Query)("from_date")),
+    __param(3, (0, common_1.Query)("to_date")),
+    __param(4, (0, common_1.Query)("payment_status")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], ErpInvoicesController.prototype, "findAll", null);
 __decorate([
@@ -70,6 +93,27 @@ __decorate([
     __metadata("design:paramtypes", [documents_dto_1.CreateInvoiceDto]),
     __metadata("design:returntype", void 0)
 ], ErpInvoicesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Update invoice header / payment fields" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/invoice.entity").Invoice }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ErpInvoicesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Delete invoice" }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpInvoicesController.prototype, "remove", null);
 exports.ErpInvoicesController = ErpInvoicesController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpInvoices),
     (0, common_1.Controller)("invoices"),

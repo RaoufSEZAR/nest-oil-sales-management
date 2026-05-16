@@ -27,9 +27,25 @@ let ErpPaymentsService = class ErpPaymentsService {
         this.repo = repo;
         this.sequences = sequences;
     }
-    findAll() {
+    findAll(filters) {
+        const where = {};
+        if (filters?.customer_id)
+            where.customer = { id: filters.customer_id };
+        if (filters?.received_by)
+            where.receivedBy = { id: filters.received_by };
+        if (filters?.from_date && filters?.to_date) {
+            where.paymentDate = (0, typeorm_2.Between)(new Date(filters.from_date), new Date(filters.to_date));
+        }
         return this.repo.find({
+            where,
             order: { id: "DESC" },
+            relations: { customer: true, receivedBy: true },
+        });
+    }
+    findByCustomer(customerId) {
+        return this.repo.find({
+            where: { customer: { id: customerId } },
+            order: { paymentDate: "DESC" },
             relations: { customer: true, receivedBy: true },
         });
     }
@@ -64,6 +80,33 @@ let ErpPaymentsService = class ErpPaymentsService {
             lastEditAllowedUntil: null,
         });
         return this.repo.save(entity);
+    }
+    async update(id, dto) {
+        const row = await this.findOne(id);
+        if (dto.amount !== undefined)
+            row.amount = dec4(dto.amount);
+        if (dto.currency !== undefined)
+            row.currency = dto.currency;
+        if (dto.exchangeRate !== undefined)
+            row.exchangeRate = dec4(dto.exchangeRate);
+        if (dto.paymentMethod !== undefined)
+            row.paymentMethod = dto.paymentMethod;
+        if (dto.paymentDate !== undefined)
+            row.paymentDate = new Date(dto.paymentDate);
+        if (dto.referenceNumber !== undefined)
+            row.referenceNumber = dto.referenceNumber ?? null;
+        if (dto.notes !== undefined)
+            row.notes = dto.notes ?? null;
+        if (dto.amount !== undefined || dto.exchangeRate !== undefined) {
+            const amount = parseFloat(row.amount);
+            const rate = parseFloat(row.exchangeRate);
+            row.amountUsd = dec4(amount * rate);
+        }
+        return this.repo.save(row);
+    }
+    async remove(id) {
+        await this.findOne(id);
+        await this.repo.delete(id);
     }
 };
 exports.ErpPaymentsService = ErpPaymentsService;

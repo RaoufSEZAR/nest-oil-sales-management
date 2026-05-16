@@ -30,6 +30,12 @@ let AuthController = class AuthController {
     async login(loginDto) {
         return this.authService.login(loginDto);
     }
+    async signup(createUserDto) {
+        return this.authService.register(createUserDto);
+    }
+    logout() {
+        return { message: "Logged out successfully" };
+    }
     async register(createUserDto) {
         return this.authService.register(createUserDto);
     }
@@ -108,6 +114,32 @@ __decorate([
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)("signup"),
+    (0, throttle_auth_decorator_1.ThrottleAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: "User registration (legacy alias for /register)" }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: "Registration successful",
+        type: auth_response_dto_1.AuthResponseDto,
+    }),
+    openapi.ApiResponse({ status: 201, type: require("./dto/auth-response.dto").AuthResponseDto }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "signup", null);
+__decorate([
+    (0, common_1.Post)("logout"),
+    (0, common_1.HttpCode)(200),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({ summary: "Logout (stateless; legacy compatibility)" }),
+    openapi.ApiResponse({ status: 200 }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "logout", null);
 __decorate([
     (0, throttle_auth_decorator_1.ThrottleAuth)(),
     (0, common_1.Post)("register"),

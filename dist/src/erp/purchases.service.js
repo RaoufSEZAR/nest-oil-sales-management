@@ -20,6 +20,8 @@ const purchase_entity_1 = require("./entities/purchase.entity");
 const purchase_item_entity_1 = require("./entities/purchase-item.entity");
 const purchase_distribution_entity_1 = require("./entities/purchase-distribution.entity");
 const sequence_service_1 = require("./sequence.service");
+const purchase_receipt_status_enum_1 = require("./enums/purchase-receipt-status.enum");
+const purchase_payment_status_enum_1 = require("./enums/purchase-payment-status.enum");
 const trade_currency_enum_1 = require("./enums/trade-currency.enum");
 const products_service_1 = require("../products/products.service");
 function dec4(n) {
@@ -142,6 +144,47 @@ let ErpPurchasesService = class ErpPurchasesService {
         const saved = await this.distributions.save(entity);
         await this.productsService.decreaseStock(dto.productId, dto.quantity);
         return saved;
+    }
+    async confirmReceipt(id, confirmedById) {
+        const row = await this.findOne(id);
+        row.receiptStatus = purchase_receipt_status_enum_1.PurchaseReceiptStatus.CONFIRMED;
+        row.confirmedBy = { id: confirmedById };
+        row.confirmedAt = new Date();
+        await this.purchases.save(row);
+        return this.findOne(id);
+    }
+    async rejectReceipt(id, confirmedById, notes) {
+        const row = await this.findOne(id);
+        row.receiptStatus = purchase_receipt_status_enum_1.PurchaseReceiptStatus.REJECTED;
+        row.confirmedBy = { id: confirmedById };
+        row.confirmedAt = new Date();
+        if (notes) {
+            row.notes = [row.notes, `[reject: ${notes}]`].filter(Boolean).join("\n");
+        }
+        await this.purchases.save(row);
+        return this.findOne(id);
+    }
+    async updatePayment(id, body) {
+        const row = await this.findOne(id);
+        const cur = (body.currency || row.currency || "USD").toUpperCase();
+        const rate = body.exchange_rate ?? parseFloat(row.exchangeRate || "1");
+        const paidOrig = body.paid_amount;
+        const paidUsd = cur === "USD" ? paidOrig : paidOrig / rate;
+        const totalAmt = parseFloat(row.totalAmount);
+        let paymentStatus = purchase_payment_status_enum_1.PurchasePaymentStatus.UNPAID;
+        if (paidUsd > 0.01 && paidUsd < totalAmt - 0.01) {
+            paymentStatus = purchase_payment_status_enum_1.PurchasePaymentStatus.PARTIAL;
+        }
+        else if (paidUsd >= totalAmt - 0.01) {
+            paymentStatus = purchase_payment_status_enum_1.PurchasePaymentStatus.PAID;
+        }
+        row.paidAmount = dec4(paidOrig);
+        row.currency = cur;
+        row.exchangeRate = dec4(rate);
+        row.amountUsd = dec4(paidUsd);
+        row.paymentStatus = paymentStatus;
+        await this.purchases.save(row);
+        return this.findOne(id);
     }
 };
 exports.ErpPurchasesService = ErpPurchasesService;

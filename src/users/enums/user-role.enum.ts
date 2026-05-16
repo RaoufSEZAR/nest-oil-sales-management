@@ -13,3 +13,6 @@ export const USER_MANAGEMENT_ROLES = [
 	UserRole.SUPER_ADMIN,
 	UserRole.MANAGER,
 ] as const;
+
+/** Roles for ERP admin operations (purchases, reports, etc.). */
+export const ERP_MANAGEMENT_ROLES = USER_MANAGEMENT_ROLES;

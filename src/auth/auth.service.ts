@@ -22,8 +22,25 @@ export class AuthService {
     return null;
   }
 
+  async validateUserByPhone(phone: string, password: string): Promise<any> {
+    const user = await this.usersService.findByPhoneNumber(phone);
+    if (user && await bcrypt.compare(password, user.password)) {
+      if (!user.isActive) {
+        throw new UnauthorizedException('Account is inactive');
+      }
+      const { password: _pw, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
+    let user: Record<string, unknown> | null = null;
+    if (loginDto.email) {
+      user = await this.validateUser(loginDto.email, loginDto.password);
+    } else if (loginDto.phone) {
+      user = await this.validateUserByPhone(loginDto.phone, loginDto.password);
+    }
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }

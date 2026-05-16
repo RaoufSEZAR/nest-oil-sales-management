@@ -163,4 +163,15 @@ export class ErpInventoryTransfersService {
 			});
 		});
 	}
+
+	async complete(id: number): Promise<InventoryTransfer> {
+		return this.update(id, {
+			status: TransferStatus.COMPLETED,
+			completedAt: new Date().toISOString(),
+		});
+	}
+
+	async cancel(id: number): Promise<InventoryTransfer> {
+		return this.update(id, { status: TransferStatus.CANCELLED });
+	}
 }

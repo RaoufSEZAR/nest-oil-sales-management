@@ -20,4 +20,5 @@ export declare class CentersController {
     }, dto: CreateSubCenterRequestDto): Promise<import("./entities/center.entity").Center>;
     findOne(id: number): Promise<import("./entities/center.entity").Center>;
     update(id: number, dto: UpdateCenterDto): Promise<import("./entities/center.entity").Center>;
+    updatePut(id: number, dto: UpdateCenterDto): Promise<import("./entities/center.entity").Center>;
 }

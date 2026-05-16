@@ -149,6 +149,15 @@ let ErpInventoryTransfersService = class ErpInventoryTransfersService {
             });
         });
     }
+    async complete(id) {
+        return this.update(id, {
+            status: transfer_status_enum_1.TransferStatus.COMPLETED,
+            completedAt: new Date().toISOString(),
+        });
+    }
+    async cancel(id) {
+        return this.update(id, { status: transfer_status_enum_1.TransferStatus.CANCELLED });
+    }
 };
 exports.ErpInventoryTransfersService = ErpInventoryTransfersService;
 exports.ErpInventoryTransfersService = ErpInventoryTransfersService = __decorate([

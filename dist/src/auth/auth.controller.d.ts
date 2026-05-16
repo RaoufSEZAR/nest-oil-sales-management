@@ -7,6 +7,10 @@ export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     login(loginDto: LoginDto): Promise<AuthResponseDto>;
+    signup(createUserDto: CreateUserDto): Promise<AuthResponseDto>;
+    logout(): {
+        message: string;
+    };
     register(createUserDto: CreateUserDto): Promise<AuthResponseDto>;
     getProfile(req: any): Promise<UserProfileDto>;
     getMe(req: any): Promise<UserProfileDto>;

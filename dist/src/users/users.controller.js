@@ -17,6 +17,8 @@ const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const users_service_1 = require("./users.service");
+const hr_service_1 = require("./hr.service");
+const update_hr_settings_dto_1 = require("./dto/update-hr-settings.dto");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const update_user_dto_1 = require("./dto/update-user.dto");
 const assign_center_dto_1 = require("./dto/assign-center.dto");
@@ -29,8 +31,9 @@ const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const user_role_enum_1 = require("./enums/user-role.enum");
 let UsersController = class UsersController {
-    constructor(usersService) {
+    constructor(usersService, hrService) {
         this.usersService = usersService;
+        this.hrService = hrService;
     }
     create(createUserDto) {
         return this.usersService.create(createUserDto);
@@ -40,6 +43,12 @@ let UsersController = class UsersController {
     }
     findByCenter(centerId) {
         return this.usersService.findByCenter(centerId);
+    }
+    getHrSettings() {
+        return this.hrService.getHrSettings();
+    }
+    getMonthlyPayroll(month) {
+        return this.hrService.getMonthlyPayroll(month);
     }
     findAll(page, limit, role, centerIdRaw, activeRaw) {
         const pageNum = page ? parseInt(page.toString(), 10) : 1;
@@ -69,6 +78,9 @@ let UsersController = class UsersController {
     }
     unassign(id, dto) {
         return this.usersService.unassign(id, dto.remove);
+    }
+    updateHrSettings(id, dto) {
+        return this.hrService.updateHrSettings(id, dto);
     }
     toggleActive(id) {
         return this.usersService.toggleActive(id);
@@ -130,6 +142,25 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findByCenter", null);
+__decorate([
+    (0, common_1.Get)("hr/settings"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "HR settings for all active users (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: [require("./entities/user.entity").User] }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getHrSettings", null);
+__decorate([
+    (0, common_1.Get)("hr/payroll/:month"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Monthly payroll report (legacy)" }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("month")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getMonthlyPayroll", null);
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
@@ -209,6 +240,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "unassign", null);
 __decorate([
+    (0, common_1.Put)(":id/hr-settings"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Update HR settings for a user (legacy)" }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_hr_settings_dto_1.UpdateHrSettingsDto]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateHrSettings", null);
+__decorate([
     (0, common_1.Put)(":id/toggle-active"),
     (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
     (0, swagger_1.ApiOperation)({
@@ -286,6 +328,7 @@ exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)("users"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, swagger_1.ApiBearerAuth)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService,
+        hr_service_1.HrService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

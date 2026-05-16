@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from "typeorm";
+import { dateRangeWhere } from "src/common/utils/query-filters";
 import { Expense } from "src/erp/entities/expense.entity";
 import { CreateExpenseDto } from "src/erp/dto/documents.dto";
 import { SequenceService } from "src/erp/sequence.service";
@@ -19,11 +20,37 @@ export class ErpExpensesService {
 		private readonly sequences: SequenceService,
 	) {}
 
-	findAll(): Promise<Expense[]> {
+	findAll(filters?: {
+		category?: string;
+		center_id?: number;
+		from_date?: string;
+		to_date?: string;
+	}): Promise<Expense[]> {
+		const where: FindOptionsWhere<Expense> = {};
+		if (filters?.category) where.category = filters.category;
+		if (filters?.center_id) where.center = { id: filters.center_id };
+		const dateFilter = dateRangeWhere(filters?.from_date, filters?.to_date);
+		if (dateFilter) where.date = dateFilter;
+
 		return this.repo.find({
+			where,
 			order: { id: "DESC" },
 			relations: { center: true, paidBy: true },
 		});
+	}
+
+	async getCategories(): Promise<string[]> {
+		const rows = await this.repo
+			.createQueryBuilder("e")
+			.select("DISTINCT e.category", "category")
+			.orderBy("e.category", "ASC")
+			.getRawMany<{ category: string }>();
+		return rows.map((r) => r.category);
+	}
+
+	async remove(id: number): Promise<void> {
+		await this.findOne(id);
+		await this.repo.delete(id);
 	}
 
 	async findOne(id: number): Promise<Expense> {

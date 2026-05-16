@@ -21,11 +21,32 @@ let ErpCustomersService = class ErpCustomersService {
     constructor(repo) {
         this.repo = repo;
     }
-    findAll() {
+    findAll(filters) {
+        const where = {};
+        if (filters?.sales_rep_id)
+            where.salesRep = { id: filters.sales_rep_id };
+        if (filters?.area)
+            where.area = filters.area;
+        if (filters?.search) {
+            where.name = (0, typeorm_2.Like)(`%${filters.search}%`);
+        }
         return this.repo.find({
+            where,
             order: { id: "DESC" },
             relations: { salesRep: true },
         });
+    }
+    async getBalance(id) {
+        const customer = await this.findOne(id);
+        return {
+            customer_id: customer.id,
+            balance: parseFloat(customer.balance || "0"),
+            deferred_payment: parseFloat(customer.deferredPayment || "0"),
+        };
+    }
+    async remove(id) {
+        await this.findOne(id);
+        await this.repo.delete(id);
     }
     async findOne(id) {
         const row = await this.repo.findOne({

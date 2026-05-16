@@ -28,6 +28,7 @@ export declare class UsersService {
     findOneWithRelations(id: string): Promise<User>;
     findOneWithPassword(id: string): Promise<User>;
     findByEmail(email: string): Promise<User | null>;
+    findByPhoneNumber(phone: string): Promise<User | null>;
     update(id: string, updateUserDto: UpdateUserDto, options?: {
         allowStaffPasswordReset?: boolean;
     }): Promise<User>;

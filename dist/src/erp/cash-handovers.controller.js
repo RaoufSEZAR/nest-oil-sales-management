@@ -16,6 +16,7 @@ exports.ErpCashHandoversController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const cash_handover_status_enum_1 = require("./enums/cash-handover-status.enum");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
@@ -27,8 +28,14 @@ let ErpCashHandoversController = class ErpCashHandoversController {
     constructor(handovers) {
         this.handovers = handovers;
     }
-    findAll() {
-        return this.handovers.findAll();
+    findAll(from_type, from_id, to_type, to_id, status) {
+        return this.handovers.findFiltered({
+            from_type,
+            from_id: from_id ? parseInt(from_id, 10) : undefined,
+            to_type,
+            to_id: to_id ? parseInt(to_id, 10) : undefined,
+            status,
+        });
     }
     findOne(id) {
         return this.handovers.findOne(id);
@@ -39,15 +46,31 @@ let ErpCashHandoversController = class ErpCashHandoversController {
     update(id, dto) {
         return this.handovers.update(id, dto);
     }
+    confirm(id, req) {
+        return this.handovers.confirm(id, req.user.userId);
+    }
+    reject(id, body) {
+        return this.handovers.reject(id, body.notes);
+    }
 };
 exports.ErpCashHandoversController = ErpCashHandoversController;
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "List cash handovers" }),
+    (0, swagger_1.ApiQuery)({ name: "from_type", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "from_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "to_type", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "to_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "status", required: false, enum: cash_handover_status_enum_1.CashHandoverStatus }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/cash-handover.entity").CashHandover] }),
+    __param(0, (0, common_1.Query)("from_type")),
+    __param(1, (0, common_1.Query)("from_id")),
+    __param(2, (0, common_1.Query)("to_type")),
+    __param(3, (0, common_1.Query)("to_id")),
+    __param(4, (0, common_1.Query)("status")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], ErpCashHandoversController.prototype, "findAll", null);
 __decorate([
@@ -81,6 +104,28 @@ __decorate([
     __metadata("design:paramtypes", [Number, documents_dto_1.UpdateCashHandoverDto]),
     __metadata("design:returntype", void 0)
 ], ErpCashHandoversController.prototype, "update", null);
+__decorate([
+    (0, common_1.Patch)(":id/confirm"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Confirm cash handover (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/cash-handover.entity").CashHandover }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ErpCashHandoversController.prototype, "confirm", null);
+__decorate([
+    (0, common_1.Patch)(":id/reject"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Reject cash handover (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/cash-handover.entity").CashHandover }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ErpCashHandoversController.prototype, "reject", null);
 exports.ErpCashHandoversController = ErpCashHandoversController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpCashHandovers),
     (0, common_1.Controller)("cash-handovers"),

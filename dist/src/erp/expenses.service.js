@@ -16,6 +16,7 @@ exports.ErpExpensesService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const query_filters_1 = require("../common/utils/query-filters");
 const expense_entity_1 = require("./entities/expense.entity");
 const sequence_service_1 = require("./sequence.service");
 const trade_currency_enum_1 = require("./enums/trade-currency.enum");
@@ -27,11 +28,32 @@ let ErpExpensesService = class ErpExpensesService {
         this.repo = repo;
         this.sequences = sequences;
     }
-    findAll() {
+    findAll(filters) {
+        const where = {};
+        if (filters?.category)
+            where.category = filters.category;
+        if (filters?.center_id)
+            where.center = { id: filters.center_id };
+        const dateFilter = (0, query_filters_1.dateRangeWhere)(filters?.from_date, filters?.to_date);
+        if (dateFilter)
+            where.date = dateFilter;
         return this.repo.find({
+            where,
             order: { id: "DESC" },
             relations: { center: true, paidBy: true },
         });
+    }
+    async getCategories() {
+        const rows = await this.repo
+            .createQueryBuilder("e")
+            .select("DISTINCT e.category", "category")
+            .orderBy("e.category", "ASC")
+            .getRawMany();
+        return rows.map((r) => r.category);
+    }
+    async remove(id) {
+        await this.findOne(id);
+        await this.repo.delete(id);
     }
     async findOne(id) {
         const row = await this.repo.findOne({

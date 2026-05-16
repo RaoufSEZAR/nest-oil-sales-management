@@ -16,6 +16,9 @@ import { CurrencyExchange } from "src/erp/entities/currency-exchange.entity";
 import { InventoryTransfer } from "src/erp/entities/inventory-transfer.entity";
 import { TransferItem } from "src/erp/entities/transfer-item.entity";
 import { CashHandover } from "src/erp/entities/cash-handover.entity";
+import { Center } from "src/centers/entities/center.entity";
+import { Vehicle } from "src/vehicles/entities/vehicle.entity";
+import { Product, Inventory } from "src/products/entities/product.entity";
 import { SequenceService } from "src/erp/sequence.service";
 import { ErpCustomersService } from "src/erp/customers.service";
 import { ErpCustomersController } from "src/erp/customers.controller";
@@ -37,6 +40,14 @@ import { ErpInventoryTransfersService } from "src/erp/inventory-transfers.servic
 import { ErpInventoryTransfersController } from "src/erp/inventory-transfers.controller";
 import { ErpCashHandoversService } from "src/erp/cash-handovers.service";
 import { ErpCashHandoversController } from "src/erp/cash-handovers.controller";
+import { ReportsService } from "src/erp/reports/reports.service";
+import { ReportsController } from "src/erp/reports/reports.controller";
+import { CashFlowService } from "src/erp/cash-flow/cash-flow.service";
+import { CashFlowController } from "src/erp/cash-flow/cash-flow.controller";
+import { TripsLegacyController } from "src/erp/legacy/trips-legacy.controller";
+import { TransfersLegacyController } from "src/erp/legacy/transfers-legacy.controller";
+import { ExchangesLegacyController } from "src/erp/legacy/exchanges-legacy.controller";
+import { CashLegacyController } from "src/erp/legacy/cash-legacy.controller";
 import { ProductsModule } from "src/products/products.module";
 
 const erpEntities = [
@@ -56,6 +67,10 @@ const erpEntities = [
 	InventoryTransfer,
 	TransferItem,
 	CashHandover,
+	Center,
+	Vehicle,
+	Product,
+	Inventory,
 ];
 
 @Module({
@@ -71,6 +86,12 @@ const erpEntities = [
 		ErpCurrencyExchangesController,
 		ErpInventoryTransfersController,
 		ErpCashHandoversController,
+		ReportsController,
+		CashFlowController,
+		TripsLegacyController,
+		TransfersLegacyController,
+		ExchangesLegacyController,
+		CashLegacyController,
 	],
 	providers: [
 		SequenceService,
@@ -84,6 +105,8 @@ const erpEntities = [
 		ErpCurrencyExchangesService,
 		ErpInventoryTransfersService,
 		ErpCashHandoversService,
+		ReportsService,
+		CashFlowService,
 	],
 	exports: [TypeOrmModule, SequenceService],
 })

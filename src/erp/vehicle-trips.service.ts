@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from "typeorm";
 import { VehicleTrip } from "src/erp/entities/vehicle-trip.entity";
 import {
 	CreateVehicleTripDto,
@@ -22,10 +22,26 @@ export class ErpVehicleTripsService {
 		private readonly sequences: SequenceService,
 	) {}
 
-	findAll(): Promise<VehicleTrip[]> {
+	findAll(filters?: {
+		vehicle_id?: number;
+		status?: TripStatus;
+	}): Promise<VehicleTrip[]> {
+		const where: FindOptionsWhere<VehicleTrip> = {};
+		if (filters?.vehicle_id) where.vehicle = { id: filters.vehicle_id };
+		if (filters?.status) where.status = filters.status;
+
 		return this.repo.find({
+			where,
 			order: { id: "DESC" },
 			relations: { vehicle: true, salesRep: true },
+		});
+	}
+
+	async findActiveByVehicle(vehicleId: number): Promise<VehicleTrip | null> {
+		return this.repo.findOne({
+			where: { vehicle: { id: vehicleId }, status: TripStatus.ACTIVE },
+			relations: { vehicle: true, salesRep: true },
+			order: { id: "DESC" },
 		});
 	}
 

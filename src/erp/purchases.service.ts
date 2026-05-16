@@ -10,6 +10,8 @@ import {
 	UpdatePurchaseDto,
 } from "src/erp/dto/documents.dto";
 import { SequenceService } from "src/erp/sequence.service";
+import { PurchaseReceiptStatus } from "src/erp/enums/purchase-receipt-status.enum";
+import { PurchasePaymentStatus } from "src/erp/enums/purchase-payment-status.enum";
 import { TradeCurrency } from "src/erp/enums/trade-currency.enum";
 import { User } from "src/users/entities/user.entity";
 import { ProductsService } from "src/products/products.service";
@@ -151,5 +153,62 @@ export class ErpPurchasesService {
 		const saved = await this.distributions.save(entity);
 		await this.productsService.decreaseStock(dto.productId, dto.quantity);
 		return saved;
+	}
+
+	async confirmReceipt(id: number, confirmedById: string): Promise<Purchase> {
+		const row = await this.findOne(id);
+		row.receiptStatus = PurchaseReceiptStatus.CONFIRMED;
+		row.confirmedBy = { id: confirmedById } as User;
+		row.confirmedAt = new Date();
+		await this.purchases.save(row);
+		return this.findOne(id);
+	}
+
+	async rejectReceipt(
+		id: number,
+		confirmedById: string,
+		notes?: string,
+	): Promise<Purchase> {
+		const row = await this.findOne(id);
+		row.receiptStatus = PurchaseReceiptStatus.REJECTED;
+		row.confirmedBy = { id: confirmedById } as User;
+		row.confirmedAt = new Date();
+		if (notes) {
+			row.notes = [row.notes, `[reject: ${notes}]`].filter(Boolean).join("\n");
+		}
+		await this.purchases.save(row);
+		return this.findOne(id);
+	}
+
+	async updatePayment(
+		id: number,
+		body: {
+			paid_amount: number;
+			currency?: string;
+			exchange_rate?: number;
+		},
+	): Promise<Purchase> {
+		const row = await this.findOne(id);
+		const cur = (body.currency || row.currency || "USD").toUpperCase();
+		const rate =
+			body.exchange_rate ?? parseFloat(row.exchangeRate || "1");
+		const paidOrig = body.paid_amount;
+		const paidUsd = cur === "USD" ? paidOrig : paidOrig / rate;
+		const totalAmt = parseFloat(row.totalAmount);
+
+		let paymentStatus = PurchasePaymentStatus.UNPAID;
+		if (paidUsd > 0.01 && paidUsd < totalAmt - 0.01) {
+			paymentStatus = PurchasePaymentStatus.PARTIAL;
+		} else if (paidUsd >= totalAmt - 0.01) {
+			paymentStatus = PurchasePaymentStatus.PAID;
+		}
+
+		row.paidAmount = dec4(paidOrig);
+		row.currency = cur as never;
+		row.exchangeRate = dec4(rate);
+		row.amountUsd = dec4(paidUsd);
+		row.paymentStatus = paymentStatus;
+		await this.purchases.save(row);
+		return this.findOne(id);
 	}
 }

@@ -27,8 +27,11 @@ let ErpCustomersController = class ErpCustomersController {
     constructor(customers) {
         this.customers = customers;
     }
-    findAll() {
-        return this.customers.findAll();
+    findAll(search, sales_rep_id, area) {
+        return this.customers.findAll({ search, sales_rep_id, area });
+    }
+    getBalance(id) {
+        return this.customers.getBalance(id);
     }
     findOne(id) {
         return this.customers.findOne(id);
@@ -39,17 +42,39 @@ let ErpCustomersController = class ErpCustomersController {
     update(id, dto) {
         return this.customers.update(id, dto);
     }
+    updatePut(id, dto) {
+        return this.customers.update(id, dto);
+    }
+    remove(id) {
+        return this.customers.remove(id);
+    }
 };
 exports.ErpCustomersController = ErpCustomersController;
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "List customers" }),
+    (0, swagger_1.ApiQuery)({ name: "search", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "sales_rep_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "area", required: false }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/customer.entity").Customer] }),
+    __param(0, (0, common_1.Query)("search")),
+    __param(1, (0, common_1.Query)("sales_rep_id")),
+    __param(2, (0, common_1.Query)("area")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", void 0)
 ], ErpCustomersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(":id/balance"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
+    (0, swagger_1.ApiOperation)({ summary: "Customer balance (legacy GET /customers/:id/balance)" }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpCustomersController.prototype, "getBalance", null);
 __decorate([
     (0, common_1.Get)(":id"),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
@@ -81,6 +106,27 @@ __decorate([
     __metadata("design:paramtypes", [Number, customer_dto_1.UpdateCustomerDto]),
     __metadata("design:returntype", void 0)
 ], ErpCustomersController.prototype, "update", null);
+__decorate([
+    (0, common_1.Put)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Update customer (legacy PUT)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/customer.entity").Customer }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, customer_dto_1.UpdateCustomerDto]),
+    __metadata("design:returntype", void 0)
+], ErpCustomersController.prototype, "updatePut", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Delete customer" }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpCustomersController.prototype, "remove", null);
 exports.ErpCustomersController = ErpCustomersController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpCustomers),
     (0, common_1.Controller)("customers"),

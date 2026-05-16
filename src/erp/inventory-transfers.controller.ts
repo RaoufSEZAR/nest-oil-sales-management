@@ -65,4 +65,18 @@ export class ErpInventoryTransfersController {
 	) {
 		return this.transfers.update(id, dto);
 	}
+
+	@Patch(":id/complete")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Complete transfer (legacy)" })
+	complete(@Param("id", ParseIntPipe) id: number) {
+		return this.transfers.complete(id);
+	}
+
+	@Patch(":id/cancel")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Cancel transfer (legacy)" })
+	cancel(@Param("id", ParseIntPipe) id: number) {
+		return this.transfers.cancel(id);
+	}
 }

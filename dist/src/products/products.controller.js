@@ -76,6 +76,9 @@ let ProductsController = class ProductsController {
     update(id, dto) {
         return this.productsService.update(id, dto);
     }
+    updatePut(id, dto) {
+        return this.productsService.update(id, dto);
+    }
     remove(id) {
         return this.productsService.softDelete(id);
     }
@@ -239,6 +242,17 @@ __decorate([
     __metadata("design:paramtypes", [Number, update_product_dto_1.UpdateProductDto]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Put)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Update product (legacy PUT)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/product.entity").Product }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_product_dto_1.UpdateProductDto]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "updatePut", null);
 __decorate([
     (0, common_1.Delete)(":id"),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),

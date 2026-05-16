@@ -72,4 +72,41 @@ export class ErpCashHandoversService {
 		if (dto.notes !== undefined) row.notes = dto.notes ?? null;
 		return this.repo.save(row);
 	}
+
+	async confirm(id: number, receivedById?: string): Promise<CashHandover> {
+		const row = await this.findOne(id);
+		row.status = CashHandoverStatus.CONFIRMED;
+		row.confirmedAt = new Date();
+		if (receivedById) row.receivedBy = { id: receivedById } as User;
+		return this.repo.save(row);
+	}
+
+	async reject(id: number, notes?: string): Promise<CashHandover> {
+		const row = await this.findOne(id);
+		row.status = CashHandoverStatus.REJECTED;
+		row.confirmedAt = new Date();
+		if (notes) row.notes = [row.notes, notes].filter(Boolean).join("\n");
+		return this.repo.save(row);
+	}
+
+	findFiltered(filters?: {
+		from_type?: string;
+		from_id?: number;
+		to_type?: string;
+		to_id?: number;
+		status?: CashHandoverStatus;
+	}): Promise<CashHandover[]> {
+		const where: Record<string, unknown> = {};
+		if (filters?.from_type) where.fromType = filters.from_type;
+		if (filters?.from_id) where.fromId = filters.from_id;
+		if (filters?.to_type) where.toType = filters.to_type;
+		if (filters?.to_id) where.toId = filters.to_id;
+		if (filters?.status) where.status = filters.status;
+
+		return this.repo.find({
+			where,
+			order: { handoverDate: "DESC" },
+			relations: { handedBy: true, receivedBy: true },
+		});
+	}
 }

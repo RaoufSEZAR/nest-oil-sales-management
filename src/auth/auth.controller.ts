@@ -7,6 +7,7 @@ import {
 	Request,
 	Headers,
 	UnauthorizedException,
+	HttpCode,
 } from "@nestjs/common";
 import {
 	ApiTags,
@@ -39,6 +40,27 @@ export class AuthController {
 	@ApiResponse({ status: 401, description: "Invalid credentials" })
 	async login(@Body() loginDto: LoginDto) {
 		return this.authService.login(loginDto);
+	}
+
+	@Post("signup")
+	@ThrottleAuth()
+	@ApiOperation({ summary: "User registration (legacy alias for /register)" })
+	@ApiResponse({
+		status: 201,
+		description: "Registration successful",
+		type: AuthResponseDto,
+	})
+	async signup(@Body() createUserDto: CreateUserDto) {
+		return this.authService.register(createUserDto);
+	}
+
+	@Post("logout")
+	@HttpCode(200)
+	@UseGuards(JwtAuthGuard)
+	@ApiBearerAuth()
+	@ApiOperation({ summary: "Logout (stateless; legacy compatibility)" })
+	logout() {
+		return { message: "Logged out successfully" };
 	}
 
 	@ThrottleAuth()

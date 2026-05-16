@@ -1,4 +1,6 @@
 import { UsersService } from "src/users/users.service";
+import { HrService } from "src/users/hr.service";
+import { UpdateHrSettingsDto } from "src/users/dto/update-hr-settings.dto";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { UpdateUserDto } from "src/users/dto/update-user.dto";
 import { AssignCenterDto } from "src/users/dto/assign-center.dto";
@@ -9,7 +11,8 @@ import { User } from "src/users/entities/user.entity";
 import { UserRole } from "src/users/enums/user-role.enum";
 export declare class UsersController {
     private readonly usersService;
-    constructor(usersService: UsersService);
+    private readonly hrService;
+    constructor(usersService: UsersService, hrService: HrService);
     create(createUserDto: CreateUserDto): Promise<User>;
     getMe(req: {
         user: {
@@ -17,6 +20,33 @@ export declare class UsersController {
         };
     }): Promise<User>;
     findByCenter(centerId: number): Promise<User[]>;
+    getHrSettings(): Promise<User[]>;
+    getMonthlyPayroll(month: string): Promise<{
+        month: string;
+        from_date: string;
+        to_date: string;
+        payroll: {
+            id: string;
+            name: string;
+            role: UserRole;
+            center_id: number;
+            base_salary: number;
+            commission_rate: number;
+            commission_basis: string;
+            sales: number;
+            cash_collected: number;
+            commission: number;
+            total_due: number;
+            paid_this_month: number;
+            remaining: number;
+        }[];
+        totals: {
+            total_due: number;
+            paid_this_month: number;
+            remaining: number;
+        };
+        paid_salaries: import("../erp/entities/expense.entity").Expense[];
+    }>;
     findAll(page?: number, limit?: number, role?: UserRole, centerIdRaw?: string, activeRaw?: string): Promise<{
         data: User[];
         total: number;
@@ -28,6 +58,14 @@ export declare class UsersController {
     assignToCenter(id: string, dto: AssignCenterDto): Promise<User>;
     assignToVehicle(id: string, dto: AssignVehicleDto): Promise<User>;
     unassign(id: string, dto: UnassignDto): Promise<User>;
+    updateHrSettings(id: string, dto: UpdateHrSettingsDto): Promise<{
+        id: string;
+        firstName: string;
+        lastName: string;
+        baseSalary: string;
+        commissionRate: string;
+        commissionBasis: string;
+    }>;
     toggleActive(id: string): Promise<User>;
     resetPassword(id: string, dto: ResetPasswordDto): Promise<{
         message: string;

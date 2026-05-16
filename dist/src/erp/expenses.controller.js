@@ -27,8 +27,16 @@ let ErpExpensesController = class ErpExpensesController {
     constructor(expenses) {
         this.expenses = expenses;
     }
-    findAll() {
-        return this.expenses.findAll();
+    getCategories() {
+        return this.expenses.getCategories();
+    }
+    findAll(category, center_id, from_date, to_date) {
+        return this.expenses.findAll({
+            category,
+            center_id: center_id ? parseInt(center_id, 10) : undefined,
+            from_date,
+            to_date,
+        });
     }
     findOne(id) {
         return this.expenses.findOne(id);
@@ -36,15 +44,35 @@ let ErpExpensesController = class ErpExpensesController {
     create(dto) {
         return this.expenses.create(dto);
     }
+    remove(id) {
+        return this.expenses.remove(id);
+    }
 };
 exports.ErpExpensesController = ErpExpensesController;
+__decorate([
+    (0, common_1.Get)("categories"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
+    (0, swagger_1.ApiOperation)({ summary: "Expense categories (legacy GET /expenses/categories)" }),
+    openapi.ApiResponse({ status: 200, type: [String] }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], ErpExpensesController.prototype, "getCategories", null);
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "List expenses" }),
+    (0, swagger_1.ApiQuery)({ name: "category", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "center_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "from_date", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "to_date", required: false }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/expense.entity").Expense] }),
+    __param(0, (0, common_1.Query)("category")),
+    __param(1, (0, common_1.Query)("center_id")),
+    __param(2, (0, common_1.Query)("from_date")),
+    __param(3, (0, common_1.Query)("to_date")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], ErpExpensesController.prototype, "findAll", null);
 __decorate([
@@ -67,6 +95,16 @@ __decorate([
     __metadata("design:paramtypes", [documents_dto_1.CreateExpenseDto]),
     __metadata("design:returntype", void 0)
 ], ErpExpensesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Delete expense" }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpExpensesController.prototype, "remove", null);
 exports.ErpExpensesController = ErpExpensesController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpExpenses),
     (0, common_1.Controller)("expenses"),

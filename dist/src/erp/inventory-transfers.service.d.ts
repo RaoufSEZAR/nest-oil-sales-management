@@ -15,4 +15,6 @@ export declare class ErpInventoryTransfersService {
     findOne(id: number): Promise<InventoryTransfer>;
     create(dto: CreateInventoryTransferDto): Promise<InventoryTransfer>;
     update(id: number, dto: UpdateInventoryTransferDto): Promise<InventoryTransfer>;
+    complete(id: number): Promise<InventoryTransfer>;
+    cancel(id: number): Promise<InventoryTransfer>;
 }

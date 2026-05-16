@@ -27,8 +27,16 @@ let ErpPaymentsController = class ErpPaymentsController {
     constructor(payments) {
         this.payments = payments;
     }
-    findAll() {
-        return this.payments.findAll();
+    findByCustomer(customerId) {
+        return this.payments.findByCustomer(customerId);
+    }
+    findAll(customer_id, received_by, from_date, to_date) {
+        return this.payments.findAll({
+            customer_id: customer_id ? parseInt(customer_id, 10) : undefined,
+            received_by,
+            from_date,
+            to_date,
+        });
     }
     findOne(id) {
         return this.payments.findOne(id);
@@ -36,15 +44,39 @@ let ErpPaymentsController = class ErpPaymentsController {
     create(dto) {
         return this.payments.create(dto);
     }
+    update(id, dto) {
+        return this.payments.update(id, dto);
+    }
+    remove(id) {
+        return this.payments.remove(id);
+    }
 };
 exports.ErpPaymentsController = ErpPaymentsController;
+__decorate([
+    (0, common_1.Get)("customer/:customer_id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
+    (0, swagger_1.ApiOperation)({ summary: "Payments for a customer (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: [require("./entities/payment.entity").Payment] }),
+    __param(0, (0, common_1.Param)("customer_id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpPaymentsController.prototype, "findByCustomer", null);
 __decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "List payments" }),
+    (0, swagger_1.ApiQuery)({ name: "customer_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "received_by", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "from_date", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "to_date", required: false }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/payment.entity").Payment] }),
+    __param(0, (0, common_1.Query)("customer_id")),
+    __param(1, (0, common_1.Query)("received_by")),
+    __param(2, (0, common_1.Query)("from_date")),
+    __param(3, (0, common_1.Query)("to_date")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", void 0)
 ], ErpPaymentsController.prototype, "findAll", null);
 __decorate([
@@ -67,6 +99,27 @@ __decorate([
     __metadata("design:paramtypes", [documents_dto_1.CreatePaymentDto]),
     __metadata("design:returntype", void 0)
 ], ErpPaymentsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Update payment" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/payment.entity").Payment }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, documents_dto_1.CreatePaymentDto]),
+    __metadata("design:returntype", void 0)
+], ErpPaymentsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Delete payment" }),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpPaymentsController.prototype, "remove", null);
 exports.ErpPaymentsController = ErpPaymentsController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpPayments),
     (0, common_1.Controller)("payments"),

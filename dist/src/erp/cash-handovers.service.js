@@ -76,6 +76,40 @@ let ErpCashHandoversService = class ErpCashHandoversService {
             row.notes = dto.notes ?? null;
         return this.repo.save(row);
     }
+    async confirm(id, receivedById) {
+        const row = await this.findOne(id);
+        row.status = cash_handover_status_enum_1.CashHandoverStatus.CONFIRMED;
+        row.confirmedAt = new Date();
+        if (receivedById)
+            row.receivedBy = { id: receivedById };
+        return this.repo.save(row);
+    }
+    async reject(id, notes) {
+        const row = await this.findOne(id);
+        row.status = cash_handover_status_enum_1.CashHandoverStatus.REJECTED;
+        row.confirmedAt = new Date();
+        if (notes)
+            row.notes = [row.notes, notes].filter(Boolean).join("\n");
+        return this.repo.save(row);
+    }
+    findFiltered(filters) {
+        const where = {};
+        if (filters?.from_type)
+            where.fromType = filters.from_type;
+        if (filters?.from_id)
+            where.fromId = filters.from_id;
+        if (filters?.to_type)
+            where.toType = filters.to_type;
+        if (filters?.to_id)
+            where.toId = filters.to_id;
+        if (filters?.status)
+            where.status = filters.status;
+        return this.repo.find({
+            where,
+            order: { handoverDate: "DESC" },
+            relations: { handedBy: true, receivedBy: true },
+        });
+    }
 };
 exports.ErpCashHandoversService = ErpCashHandoversService;
 exports.ErpCashHandoversService = ErpCashHandoversService = __decorate([

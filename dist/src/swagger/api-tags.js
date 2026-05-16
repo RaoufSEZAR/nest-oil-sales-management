@@ -18,5 +18,13 @@ exports.SwaggerTags = {
     ErpCurrencyExchanges: "ERP-Currency-exchanges",
     ErpInventoryTransfers: "ERP-Inventory-transfers",
     ErpCashHandovers: "ERP-Cash-handovers",
+    Reports: "Reports",
+    CashFlow: "Cash-flow",
+    Inventory: "Inventory",
+    Hr: "HR",
+    TripsLegacy: "Trips-legacy",
+    TransfersLegacy: "Transfers-legacy",
+    ExchangesLegacy: "Exchanges-legacy",
+    CashLegacy: "Cash-legacy",
 };
 //# sourceMappingURL=api-tags.js.map

@@ -13,6 +13,9 @@ export declare class User {
     region?: string;
     role: UserRole;
     isActive: boolean;
+    baseSalary?: string | null;
+    commissionRate?: string | null;
+    commissionBasis?: string | null;
     centerId?: number | null;
     center?: Center | null;
     vehicleId?: number | null;

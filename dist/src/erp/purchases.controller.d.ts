@@ -8,4 +8,21 @@ export declare class ErpPurchasesController {
     create(dto: CreatePurchaseDto): Promise<import("./entities/purchase.entity").Purchase>;
     update(id: number, dto: UpdatePurchaseDto): Promise<import("./entities/purchase.entity").Purchase>;
     addDistribution(id: number, dto: CreatePurchaseDistributionDto): Promise<import("./entities/purchase-distribution.entity").PurchaseDistribution>;
+    confirmReceipt(id: number, req: {
+        user: {
+            userId: string;
+        };
+    }): Promise<import("./entities/purchase.entity").Purchase>;
+    rejectReceipt(id: number, req: {
+        user: {
+            userId: string;
+        };
+    }, body: {
+        notes?: string;
+    }): Promise<import("./entities/purchase.entity").Purchase>;
+    updatePayment(id: number, body: {
+        paid_amount: number;
+        currency?: string;
+        exchange_rate?: number;
+    }): Promise<import("./entities/purchase.entity").Purchase>;
 }

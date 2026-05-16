@@ -7,4 +7,6 @@ export declare class ErpInventoryTransfersController {
     findOne(id: number): Promise<import("./entities/inventory-transfer.entity").InventoryTransfer>;
     create(dto: CreateInventoryTransferDto): Promise<import("./entities/inventory-transfer.entity").InventoryTransfer>;
     update(id: number, dto: UpdateInventoryTransferDto): Promise<import("./entities/inventory-transfer.entity").InventoryTransfer>;
+    complete(id: number): Promise<import("./entities/inventory-transfer.entity").InventoryTransfer>;
+    cancel(id: number): Promise<import("./entities/inventory-transfer.entity").InventoryTransfer>;
 }

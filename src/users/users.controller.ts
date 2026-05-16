@@ -20,6 +20,8 @@ import {
 	ApiQuery,
 } from "@nestjs/swagger";
 import { UsersService } from "src/users/users.service";
+import { HrService } from "src/users/hr.service";
+import { UpdateHrSettingsDto } from "src/users/dto/update-hr-settings.dto";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { UpdateUserDto } from "src/users/dto/update-user.dto";
 import { AssignCenterDto } from "src/users/dto/assign-center.dto";
@@ -40,7 +42,10 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class UsersController {
-	constructor(private readonly usersService: UsersService) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly hrService: HrService,
+	) {}
 
 	@Post()
 	@Roles(...USER_MANAGEMENT_ROLES)
@@ -69,6 +74,20 @@ export class UsersController {
 	@ApiResponse({ status: 200, description: "Users retrieved", type: [User] })
 	findByCenter(@Param("center_id", ParseIntPipe) centerId: number) {
 		return this.usersService.findByCenter(centerId);
+	}
+
+	@Get("hr/settings")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "HR settings for all active users (legacy)" })
+	getHrSettings() {
+		return this.hrService.getHrSettings();
+	}
+
+	@Get("hr/payroll/:month")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Monthly payroll report (legacy)" })
+	getMonthlyPayroll(@Param("month") month: string) {
+		return this.hrService.getMonthlyPayroll(month);
 	}
 
 	@Get()
@@ -151,6 +170,16 @@ export class UsersController {
 	@ApiResponse({ status: 200, description: "Assignment removed", type: User })
 	unassign(@Param("id") id: string, @Body() dto: UnassignDto) {
 		return this.usersService.unassign(id, dto.remove);
+	}
+
+	@Put(":id/hr-settings")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Update HR settings for a user (legacy)" })
+	updateHrSettings(
+		@Param("id") id: string,
+		@Body() dto: UpdateHrSettingsDto,
+	) {
+		return this.hrService.updateHrSettings(id, dto);
 	}
 
 	@Put(":id/toggle-active")

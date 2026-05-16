@@ -6,7 +6,14 @@ export declare class ErpExpensesService {
     private readonly repo;
     private readonly sequences;
     constructor(repo: Repository<Expense>, sequences: SequenceService);
-    findAll(): Promise<Expense[]>;
+    findAll(filters?: {
+        category?: string;
+        center_id?: number;
+        from_date?: string;
+        to_date?: string;
+    }): Promise<Expense[]>;
+    getCategories(): Promise<string[]>;
+    remove(id: number): Promise<void>;
     findOne(id: number): Promise<Expense>;
     create(dto: CreateExpenseDto): Promise<Expense>;
 }

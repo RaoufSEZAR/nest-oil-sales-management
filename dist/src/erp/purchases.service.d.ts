@@ -16,4 +16,11 @@ export declare class ErpPurchasesService {
     create(dto: CreatePurchaseDto): Promise<Purchase>;
     update(id: number, dto: UpdatePurchaseDto): Promise<Purchase>;
     addDistribution(purchaseId: number, dto: CreatePurchaseDistributionDto): Promise<PurchaseDistribution>;
+    confirmReceipt(id: number, confirmedById: string): Promise<Purchase>;
+    rejectReceipt(id: number, confirmedById: string, notes?: string): Promise<Purchase>;
+    updatePayment(id: number, body: {
+        paid_amount: number;
+        currency?: string;
+        exchange_rate?: number;
+    }): Promise<Purchase>;
 }

@@ -6,7 +6,15 @@ export declare class ErpPaymentsService {
     private readonly repo;
     private readonly sequences;
     constructor(repo: Repository<Payment>, sequences: SequenceService);
-    findAll(): Promise<Payment[]>;
+    findAll(filters?: {
+        customer_id?: number;
+        received_by?: string;
+        from_date?: string;
+        to_date?: string;
+    }): Promise<Payment[]>;
+    findByCustomer(customerId: number): Promise<Payment[]>;
     findOne(id: number): Promise<Payment>;
     create(dto: CreatePaymentDto): Promise<Payment>;
+    update(id: number, dto: Partial<CreatePaymentDto>): Promise<Payment>;
+    remove(id: number): Promise<void>;
 }

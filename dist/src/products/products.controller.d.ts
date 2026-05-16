@@ -17,6 +17,7 @@ export declare class ProductsController {
     increaseStock(id: number, dto: AdjustProductStockDto): Promise<Product>;
     decreaseStock(id: number, dto: AdjustProductStockDto): Promise<Product>;
     update(id: number, dto: UpdateProductDto): Promise<Product>;
+    updatePut(id: number, dto: UpdateProductDto): Promise<Product>;
     remove(id: number): Promise<{
         id: number;
         active: boolean;

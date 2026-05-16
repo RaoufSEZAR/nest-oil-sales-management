@@ -79,6 +79,41 @@ export class User {
 	@Column({ default: true })
 	isActive: boolean;
 
+	@ApiProperty({ description: "Monthly base salary (HR)", required: false })
+	@Column({
+		name: "base_salary",
+		type: "decimal",
+		precision: 10,
+		scale: 2,
+		nullable: true,
+		default: 0,
+	})
+	baseSalary?: string | null;
+
+	@ApiProperty({ description: "Commission rate percent (HR)", required: false })
+	@Column({
+		name: "commission_rate",
+		type: "decimal",
+		precision: 5,
+		scale: 2,
+		nullable: true,
+		default: 0,
+	})
+	commissionRate?: string | null;
+
+	@ApiProperty({
+		description: "Commission basis: sales or cash",
+		required: false,
+	})
+	@Column({
+		name: "commission_basis",
+		type: "varchar",
+		length: 10,
+		nullable: true,
+		default: "sales",
+	})
+	commissionBasis?: string | null;
+
 	@ApiProperty({
 		description: "Legacy ERP center assignment (integer FK to centers.id)",
 		required: false,

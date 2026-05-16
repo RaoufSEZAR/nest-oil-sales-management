@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Like, Repository } from "typeorm";
 import { Customer } from "src/erp/entities/customer.entity";
 import { User } from "src/users/entities/user.entity";
 import { CreateCustomerDto, UpdateCustomerDto } from "src/erp/dto/customer.dto";
@@ -12,11 +12,37 @@ export class ErpCustomersService {
 		private readonly repo: Repository<Customer>,
 	) {}
 
-	findAll(): Promise<Customer[]> {
+	findAll(filters?: {
+		search?: string;
+		sales_rep_id?: string;
+		area?: string;
+	}): Promise<Customer[]> {
+		const where: FindOptionsWhere<Customer> = {};
+		if (filters?.sales_rep_id) where.salesRep = { id: filters.sales_rep_id };
+		if (filters?.area) where.area = filters.area;
+		if (filters?.search) {
+			where.name = Like(`%${filters.search}%`);
+		}
+
 		return this.repo.find({
+			where,
 			order: { id: "DESC" },
 			relations: { salesRep: true },
 		});
+	}
+
+	async getBalance(id: number) {
+		const customer = await this.findOne(id);
+		return {
+			customer_id: customer.id,
+			balance: parseFloat(customer.balance || "0"),
+			deferred_payment: parseFloat(customer.deferredPayment || "0"),
+		};
+	}
+
+	async remove(id: number): Promise<void> {
+		await this.findOne(id);
+		await this.repo.delete(id);
 	}
 
 	async findOne(id: number): Promise<Customer> {

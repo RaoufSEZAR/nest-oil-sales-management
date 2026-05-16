@@ -27,8 +27,25 @@ let AuthService = class AuthService {
         }
         return null;
     }
+    async validateUserByPhone(phone, password) {
+        const user = await this.usersService.findByPhoneNumber(phone);
+        if (user && await bcrypt.compare(password, user.password)) {
+            if (!user.isActive) {
+                throw new common_1.UnauthorizedException('Account is inactive');
+            }
+            const { password: _pw, ...result } = user;
+            return result;
+        }
+        return null;
+    }
     async login(loginDto) {
-        const user = await this.validateUser(loginDto.email, loginDto.password);
+        let user = null;
+        if (loginDto.email) {
+            user = await this.validateUser(loginDto.email, loginDto.password);
+        }
+        else if (loginDto.phone) {
+            user = await this.validateUserByPhone(loginDto.phone, loginDto.password);
+        }
         if (!user) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }

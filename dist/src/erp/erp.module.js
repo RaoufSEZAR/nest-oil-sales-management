@@ -25,6 +25,9 @@ const currency_exchange_entity_1 = require("./entities/currency-exchange.entity"
 const inventory_transfer_entity_1 = require("./entities/inventory-transfer.entity");
 const transfer_item_entity_1 = require("./entities/transfer-item.entity");
 const cash_handover_entity_1 = require("./entities/cash-handover.entity");
+const center_entity_1 = require("../centers/entities/center.entity");
+const vehicle_entity_1 = require("../vehicles/entities/vehicle.entity");
+const product_entity_1 = require("../products/entities/product.entity");
 const sequence_service_1 = require("./sequence.service");
 const customers_service_1 = require("./customers.service");
 const customers_controller_1 = require("./customers.controller");
@@ -46,6 +49,14 @@ const inventory_transfers_service_1 = require("./inventory-transfers.service");
 const inventory_transfers_controller_1 = require("./inventory-transfers.controller");
 const cash_handovers_service_1 = require("./cash-handovers.service");
 const cash_handovers_controller_1 = require("./cash-handovers.controller");
+const reports_service_1 = require("./reports/reports.service");
+const reports_controller_1 = require("./reports/reports.controller");
+const cash_flow_service_1 = require("./cash-flow/cash-flow.service");
+const cash_flow_controller_1 = require("./cash-flow/cash-flow.controller");
+const trips_legacy_controller_1 = require("./legacy/trips-legacy.controller");
+const transfers_legacy_controller_1 = require("./legacy/transfers-legacy.controller");
+const exchanges_legacy_controller_1 = require("./legacy/exchanges-legacy.controller");
+const cash_legacy_controller_1 = require("./legacy/cash-legacy.controller");
 const products_module_1 = require("../products/products.module");
 const erpEntities = [
     sequence_entity_1.Sequence,
@@ -64,6 +75,10 @@ const erpEntities = [
     inventory_transfer_entity_1.InventoryTransfer,
     transfer_item_entity_1.TransferItem,
     cash_handover_entity_1.CashHandover,
+    center_entity_1.Center,
+    vehicle_entity_1.Vehicle,
+    product_entity_1.Product,
+    product_entity_1.Inventory,
 ];
 let ErpModule = class ErpModule {
 };
@@ -82,6 +97,12 @@ exports.ErpModule = ErpModule = __decorate([
             currency_exchanges_controller_1.ErpCurrencyExchangesController,
             inventory_transfers_controller_1.ErpInventoryTransfersController,
             cash_handovers_controller_1.ErpCashHandoversController,
+            reports_controller_1.ReportsController,
+            cash_flow_controller_1.CashFlowController,
+            trips_legacy_controller_1.TripsLegacyController,
+            transfers_legacy_controller_1.TransfersLegacyController,
+            exchanges_legacy_controller_1.ExchangesLegacyController,
+            cash_legacy_controller_1.CashLegacyController,
         ],
         providers: [
             sequence_service_1.SequenceService,
@@ -95,6 +116,8 @@ exports.ErpModule = ErpModule = __decorate([
             currency_exchanges_service_1.ErpCurrencyExchangesService,
             inventory_transfers_service_1.ErpInventoryTransfersService,
             cash_handovers_service_1.ErpCashHandoversService,
+            reports_service_1.ReportsService,
+            cash_flow_service_1.CashFlowService,
         ],
         exports: [typeorm_1.TypeOrmModule, sequence_service_1.SequenceService],
     })

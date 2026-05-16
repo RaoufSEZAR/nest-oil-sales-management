@@ -6,9 +6,11 @@ import {
 	Param,
 	Post,
 	ParseIntPipe,
+	Query,
 	UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { TripStatus } from "src/erp/enums/trip-status.enum";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles.guard";
 import { Roles } from "src/auth/decorators/roles.decorator";
@@ -27,11 +29,28 @@ import { SwaggerTags } from "src/swagger/api-tags";
 export class ErpVehicleTripsController {
 	constructor(private readonly trips: ErpVehicleTripsService) {}
 
+	@Get("active")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER, UserRole.USER)
+	@ApiOperation({ summary: "Active trip for vehicle (legacy GET /trips/active)" })
+	@ApiQuery({ name: "vehicle_id", required: true, type: Number })
+	findActive(@Query("vehicle_id") vehicleIdRaw: string) {
+		const vehicleId = parseInt(vehicleIdRaw, 10);
+		return this.trips.findActiveByVehicle(vehicleId);
+	}
+
 	@Get()
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({ summary: "List vehicle trips" })
-	findAll() {
-		return this.trips.findAll();
+	@ApiQuery({ name: "vehicle_id", required: false })
+	@ApiQuery({ name: "status", required: false, enum: TripStatus })
+	findAll(
+		@Query("vehicle_id") vehicle_id?: string,
+		@Query("status") status?: TripStatus,
+	) {
+		return this.trips.findAll({
+			vehicle_id: vehicle_id ? parseInt(vehicle_id, 10) : undefined,
+			status,
+		});
 	}
 
 	@Get(":id")

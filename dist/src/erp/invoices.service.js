@@ -32,8 +32,19 @@ let ErpInvoicesService = class ErpInvoicesService {
         this.sequences = sequences;
         this.productsService = productsService;
     }
-    findAll() {
+    findAll(filters) {
+        const where = {};
+        if (filters?.customer_id)
+            where.customer = { id: filters.customer_id };
+        if (filters?.sales_rep_id)
+            where.salesRep = { id: filters.sales_rep_id };
+        if (filters?.payment_status)
+            where.paymentStatus = filters.payment_status;
+        if (filters?.from_date && filters?.to_date) {
+            where.date = (0, typeorm_2.Between)(new Date(filters.from_date), new Date(filters.to_date));
+        }
         return this.invoices.find({
+            where,
             order: { id: "DESC" },
             relations: {
                 customer: true,
@@ -114,6 +125,21 @@ let ErpInvoicesService = class ErpInvoicesService {
                 },
             });
         });
+    }
+    async update(id, patch) {
+        const row = await this.findOne(id);
+        if (patch.paidAmount !== undefined)
+            row.paidAmount = dec2(patch.paidAmount);
+        if (patch.paymentStatus !== undefined)
+            row.paymentStatus = patch.paymentStatus;
+        if (patch.notes !== undefined)
+            row.notes = patch.notes ?? null;
+        await this.invoices.save(row);
+        return this.findOne(id);
+    }
+    async remove(id) {
+        await this.findOne(id);
+        await this.invoices.delete(id);
     }
 };
 exports.ErpInvoicesService = ErpInvoicesService;

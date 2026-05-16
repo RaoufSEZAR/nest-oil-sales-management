@@ -42,6 +42,15 @@ let ErpPurchasesController = class ErpPurchasesController {
     addDistribution(id, dto) {
         return this.purchases.addDistribution(id, dto);
     }
+    confirmReceipt(id, req) {
+        return this.purchases.confirmReceipt(id, req.user.userId);
+    }
+    rejectReceipt(id, req, body) {
+        return this.purchases.rejectReceipt(id, req.user.userId, body.notes);
+    }
+    updatePayment(id, body) {
+        return this.purchases.updatePayment(id, body);
+    }
 };
 exports.ErpPurchasesController = ErpPurchasesController;
 __decorate([
@@ -101,6 +110,40 @@ __decorate([
     __metadata("design:paramtypes", [Number, documents_dto_1.CreatePurchaseDistributionDto]),
     __metadata("design:returntype", void 0)
 ], ErpPurchasesController.prototype, "addDistribution", null);
+__decorate([
+    (0, common_1.Patch)(":id/confirm-receipt"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Confirm purchase receipt (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/purchase.entity").Purchase }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ErpPurchasesController.prototype, "confirmReceipt", null);
+__decorate([
+    (0, common_1.Patch)(":id/reject-receipt"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Reject purchase receipt (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/purchase.entity").Purchase }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Request)()),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object, Object]),
+    __metadata("design:returntype", void 0)
+], ErpPurchasesController.prototype, "rejectReceipt", null);
+__decorate([
+    (0, common_1.Patch)(":id/payment"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Update purchase payment (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/purchase.entity").Purchase }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ErpPurchasesController.prototype, "updatePayment", null);
 exports.ErpPurchasesController = ErpPurchasesController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpPurchases),
     (0, common_1.Controller)("purchases"),

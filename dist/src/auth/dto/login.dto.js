@@ -15,17 +15,30 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class LoginDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { email: { required: true, type: () => String, format: "email" }, password: { required: true, type: () => String } };
+        return { email: { required: false, type: () => String, format: "email" }, phone: { required: false, type: () => String }, password: { required: true, type: () => String } };
     }
 }
 exports.LoginDto = LoginDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'User email address', example: 'user@example.com' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: "User email (use email or phone)",
+        example: "user@example.com",
+    }),
+    (0, class_validator_1.ValidateIf)((o) => !o.phone),
     (0, class_validator_1.IsEmail)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: 'User password', example: 'password123' }),
+    (0, swagger_1.ApiPropertyOptional)({
+        description: "Phone number (legacy login)",
+        example: "0501234567",
+    }),
+    (0, class_validator_1.ValidateIf)((o) => !o.email),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], LoginDto.prototype, "phone", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: "User password", example: "password123" }),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);

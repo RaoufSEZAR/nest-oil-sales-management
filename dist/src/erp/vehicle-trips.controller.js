@@ -16,6 +16,7 @@ exports.ErpVehicleTripsController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const trip_status_enum_1 = require("./enums/trip-status.enum");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
@@ -27,8 +28,15 @@ let ErpVehicleTripsController = class ErpVehicleTripsController {
     constructor(trips) {
         this.trips = trips;
     }
-    findAll() {
-        return this.trips.findAll();
+    findActive(vehicleIdRaw) {
+        const vehicleId = parseInt(vehicleIdRaw, 10);
+        return this.trips.findActiveByVehicle(vehicleId);
+    }
+    findAll(vehicle_id, status) {
+        return this.trips.findAll({
+            vehicle_id: vehicle_id ? parseInt(vehicle_id, 10) : undefined,
+            status,
+        });
     }
     findOne(id) {
         return this.trips.findOne(id);
@@ -42,12 +50,27 @@ let ErpVehicleTripsController = class ErpVehicleTripsController {
 };
 exports.ErpVehicleTripsController = ErpVehicleTripsController;
 __decorate([
+    (0, common_1.Get)("active"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER, user_role_enum_1.UserRole.USER),
+    (0, swagger_1.ApiOperation)({ summary: "Active trip for vehicle (legacy GET /trips/active)" }),
+    (0, swagger_1.ApiQuery)({ name: "vehicle_id", required: true, type: Number }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/vehicle-trip.entity").VehicleTrip }),
+    __param(0, (0, common_1.Query)("vehicle_id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ErpVehicleTripsController.prototype, "findActive", null);
+__decorate([
     (0, common_1.Get)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "List vehicle trips" }),
+    (0, swagger_1.ApiQuery)({ name: "vehicle_id", required: false }),
+    (0, swagger_1.ApiQuery)({ name: "status", required: false, enum: trip_status_enum_1.TripStatus }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/vehicle-trip.entity").VehicleTrip] }),
+    __param(0, (0, common_1.Query)("vehicle_id")),
+    __param(1, (0, common_1.Query)("status")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], ErpVehicleTripsController.prototype, "findAll", null);
 __decorate([

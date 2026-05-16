@@ -16,6 +16,8 @@ exports.ErpReturnsService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const query_filters_1 = require("../common/utils/query-filters");
+const sales_return_status_enum_1 = require("./enums/sales-return-status.enum");
 const sales_return_entity_1 = require("./entities/sales-return.entity");
 const return_item_entity_1 = require("./entities/return-item.entity");
 const sequence_service_1 = require("./sequence.service");
@@ -34,8 +36,21 @@ let ErpReturnsService = class ErpReturnsService {
         this.sequences = sequences;
         this.productsService = productsService;
     }
-    findAll() {
+    findAll(filters) {
+        const where = {};
+        if (filters?.customer_id)
+            where.customer = { id: filters.customer_id };
+        if (filters?.sales_rep_id)
+            where.salesRep = { id: filters.sales_rep_id };
+        if (filters?.return_type)
+            where.returnType = filters.return_type;
+        if (filters?.status)
+            where.status = filters.status;
+        const dateFilter = (0, query_filters_1.dateRangeWhere)(filters?.from_date, filters?.to_date);
+        if (dateFilter)
+            where.date = dateFilter;
         return this.returns.find({
+            where,
             order: { id: "DESC" },
             relations: {
                 customer: true,
@@ -78,6 +93,7 @@ let ErpReturnsService = class ErpReturnsService {
                 totalAmount: dec2(total),
                 reason: dto.reason ?? null,
                 notes: dto.notes ?? null,
+                status: sales_return_status_enum_1.SalesReturnStatus.PENDING,
                 synced: false,
             });
             await em.save(ret);
@@ -93,7 +109,6 @@ let ErpReturnsService = class ErpReturnsService {
                     reasonDetail: line.reasonDetail ?? null,
                 });
                 await em.save(item);
-                await this.productsService.increaseStock(line.productId, line.quantity, em);
             }
             return em.findOneOrFail(sales_return_entity_1.SalesReturn, {
                 where: { id: ret.id },
@@ -105,6 +120,87 @@ let ErpReturnsService = class ErpReturnsService {
                 },
             });
         });
+    }
+    async updateStatus(id, status, managerNotes) {
+        if (!Object.values(sales_return_status_enum_1.SalesReturnStatus).includes(status)) {
+            throw new common_1.BadRequestException("Invalid return status");
+        }
+        return this.dataSource.transaction(async (em) => {
+            const row = await em.findOne(sales_return_entity_1.SalesReturn, {
+                where: { id },
+                relations: {
+                    customer: true,
+                    items: { product: true },
+                },
+            });
+            if (!row)
+                throw new common_1.NotFoundException(`Return ${id} not found`);
+            if (row.status !== sales_return_status_enum_1.SalesReturnStatus.PENDING) {
+                throw new common_1.BadRequestException("Return already processed");
+            }
+            if (status === sales_return_status_enum_1.SalesReturnStatus.APPROVED) {
+                const customer = row.customer;
+                customer.balance = (parseFloat(customer.balance || "0") +
+                    parseFloat(row.totalAmount || "0")).toFixed(4);
+                await em.save(customer);
+                for (const line of row.items ?? []) {
+                    const productId = line.product?.id;
+                    if (!productId)
+                        continue;
+                    await this.productsService.increaseStock(productId, parseFloat(line.quantity), em);
+                }
+            }
+            row.status = status;
+            if (managerNotes !== undefined) {
+                row.notes = [row.notes, managerNotes].filter(Boolean).join("\n");
+            }
+            await em.save(row);
+            return em.findOneOrFail(sales_return_entity_1.SalesReturn, {
+                where: { id },
+                relations: {
+                    customer: true,
+                    salesRep: true,
+                    originalInvoice: true,
+                    items: { product: true },
+                },
+            });
+        });
+    }
+    async getReport(filters) {
+        const status = filters?.status ?? sales_return_status_enum_1.SalesReturnStatus.APPROVED;
+        const rows = await this.findAll({
+            status,
+            from_date: filters?.from_date,
+            to_date: filters?.to_date,
+        });
+        const byProduct = {};
+        for (const ret of rows) {
+            for (const line of ret.items ?? []) {
+                const pid = line.product?.id;
+                if (!pid)
+                    continue;
+                if (!byProduct[pid]) {
+                    byProduct[pid] = {
+                        product_id: pid,
+                        name: line.product?.name ?? "",
+                        total_qty: 0,
+                        total_amount: 0,
+                    };
+                }
+                byProduct[pid].total_qty += parseFloat(line.quantity);
+                byProduct[pid].total_amount += parseFloat(line.total);
+            }
+        }
+        const productReport = Object.values(byProduct);
+        return {
+            stats: {
+                total_returns: rows.length,
+                total_amount: rows.reduce((s, r) => s + parseFloat(r.totalAmount || "0"), 0),
+                total_items: productReport.reduce((s, p) => s + p.total_qty, 0),
+            },
+            by_product: productReport,
+            returns: rows.slice(0, 50),
+        };
     }
 };
 exports.ErpReturnsService = ErpReturnsService;

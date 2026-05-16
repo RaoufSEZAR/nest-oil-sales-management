@@ -39,6 +39,12 @@ let ErpInventoryTransfersController = class ErpInventoryTransfersController {
     update(id, dto) {
         return this.transfers.update(id, dto);
     }
+    complete(id) {
+        return this.transfers.complete(id);
+    }
+    cancel(id) {
+        return this.transfers.cancel(id);
+    }
 };
 exports.ErpInventoryTransfersController = ErpInventoryTransfersController;
 __decorate([
@@ -87,6 +93,26 @@ __decorate([
     __metadata("design:paramtypes", [Number, documents_dto_1.UpdateInventoryTransferDto]),
     __metadata("design:returntype", void 0)
 ], ErpInventoryTransfersController.prototype, "update", null);
+__decorate([
+    (0, common_1.Patch)(":id/complete"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Complete transfer (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/inventory-transfer.entity").InventoryTransfer }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpInventoryTransfersController.prototype, "complete", null);
+__decorate([
+    (0, common_1.Patch)(":id/cancel"),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: "Cancel transfer (legacy)" }),
+    openapi.ApiResponse({ status: 200, type: require("./entities/inventory-transfer.entity").InventoryTransfer }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ErpInventoryTransfersController.prototype, "cancel", null);
 exports.ErpInventoryTransfersController = ErpInventoryTransfersController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpInventoryTransfers),
     (0, common_1.Controller)("inventory-transfers"),

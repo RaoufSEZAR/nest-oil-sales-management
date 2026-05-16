@@ -6,6 +6,7 @@ import {
 	Patch,
 	Post,
 	ParseIntPipe,
+	Request,
 	UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
@@ -75,5 +76,37 @@ export class ErpPurchasesController {
 		@Body() dto: CreatePurchaseDistributionDto,
 	) {
 		return this.purchases.addDistribution(id, dto);
+	}
+
+	@Patch(":id/confirm-receipt")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Confirm purchase receipt (legacy)" })
+	confirmReceipt(
+		@Param("id", ParseIntPipe) id: number,
+		@Request() req: { user: { userId: string } },
+	) {
+		return this.purchases.confirmReceipt(id, req.user.userId);
+	}
+
+	@Patch(":id/reject-receipt")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Reject purchase receipt (legacy)" })
+	rejectReceipt(
+		@Param("id", ParseIntPipe) id: number,
+		@Request() req: { user: { userId: string } },
+		@Body() body: { notes?: string },
+	) {
+		return this.purchases.rejectReceipt(id, req.user.userId, body.notes);
+	}
+
+	@Patch(":id/payment")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Update purchase payment (legacy)" })
+	updatePayment(
+		@Param("id", ParseIntPipe) id: number,
+		@Body()
+		body: { paid_amount: number; currency?: string; exchange_rate?: number },
+	) {
+		return this.purchases.updatePayment(id, body);
 	}
 }

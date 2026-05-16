@@ -18,7 +18,7 @@ const center_entity_1 = require("../../centers/entities/center.entity");
 const vehicle_entity_1 = require("../../vehicles/entities/vehicle.entity");
 let User = class User {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, email: { required: true, type: () => String }, password: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: false, type: () => String }, address: { required: false, type: () => String }, preferredLang: { required: false, type: () => String }, region: { required: false, type: () => String }, role: { required: true, enum: require("../enums/user-role.enum").UserRole }, isActive: { required: true, type: () => Boolean }, centerId: { required: false, type: () => Number, nullable: true }, center: { required: false, type: () => require("../../centers/entities/center.entity").Center, nullable: true }, vehicleId: { required: false, type: () => Number, nullable: true }, vehicle: { required: false, type: () => require("../../vehicles/entities/vehicle.entity").Vehicle, nullable: true }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } };
+        return { id: { required: true, type: () => String }, email: { required: true, type: () => String }, password: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: false, type: () => String }, address: { required: false, type: () => String }, preferredLang: { required: false, type: () => String }, region: { required: false, type: () => String }, role: { required: true, enum: require("../enums/user-role.enum").UserRole }, isActive: { required: true, type: () => Boolean }, baseSalary: { required: false, type: () => String, nullable: true }, commissionRate: { required: false, type: () => String, nullable: true }, commissionBasis: { required: false, type: () => String, nullable: true }, centerId: { required: false, type: () => Number, nullable: true }, center: { required: false, type: () => require("../../centers/entities/center.entity").Center, nullable: true }, vehicleId: { required: false, type: () => Number, nullable: true }, vehicle: { required: false, type: () => require("../../vehicles/entities/vehicle.entity").Vehicle, nullable: true }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } };
     }
 };
 exports.User = User;
@@ -98,6 +98,44 @@ __decorate([
     (0, typeorm_1.Column)({ default: true }),
     __metadata("design:type", Boolean)
 ], User.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: "Monthly base salary (HR)", required: false }),
+    (0, typeorm_1.Column)({
+        name: "base_salary",
+        type: "decimal",
+        precision: 10,
+        scale: 2,
+        nullable: true,
+        default: 0,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "baseSalary", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: "Commission rate percent (HR)", required: false }),
+    (0, typeorm_1.Column)({
+        name: "commission_rate",
+        type: "decimal",
+        precision: 5,
+        scale: 2,
+        nullable: true,
+        default: 0,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "commissionRate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: "Commission basis: sales or cash",
+        required: false,
+    }),
+    (0, typeorm_1.Column)({
+        name: "commission_basis",
+        type: "varchar",
+        length: 10,
+        nullable: true,
+        default: "sales",
+    }),
+    __metadata("design:type", String)
+], User.prototype, "commissionBasis", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: "Legacy ERP center assignment (integer FK to centers.id)",

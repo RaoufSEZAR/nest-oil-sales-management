@@ -4,6 +4,7 @@ import {
 	Post,
 	Body,
 	Patch,
+	Put,
 	Delete,
 	Param,
 	ParseIntPipe,
@@ -208,6 +209,16 @@ export class ProductsController {
 			"Partial update; include **`stock`** to set absolute quantity (not a delta).",
 	})
 	update(
+		@Param("id", ParseIntPipe) id: number,
+		@Body() dto: UpdateProductDto,
+	) {
+		return this.productsService.update(id, dto);
+	}
+
+	@Put(":id")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Update product (legacy PUT)" })
+	updatePut(
 		@Param("id", ParseIntPipe) id: number,
 		@Body() dto: UpdateProductDto,
 	) {

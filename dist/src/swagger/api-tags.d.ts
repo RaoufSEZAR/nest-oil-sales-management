@@ -15,4 +15,12 @@ export declare const SwaggerTags: {
     readonly ErpCurrencyExchanges: "ERP-Currency-exchanges";
     readonly ErpInventoryTransfers: "ERP-Inventory-transfers";
     readonly ErpCashHandovers: "ERP-Cash-handovers";
+    readonly Reports: "Reports";
+    readonly CashFlow: "Cash-flow";
+    readonly Inventory: "Inventory";
+    readonly Hr: "HR";
+    readonly TripsLegacy: "Trips-legacy";
+    readonly TransfersLegacy: "Transfers-legacy";
+    readonly ExchangesLegacy: "Exchanges-legacy";
+    readonly CashLegacy: "Cash-legacy";
 };

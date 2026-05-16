@@ -4,6 +4,7 @@ import {
 	Post,
 	Body,
 	Patch,
+	Put,
 	Param,
 	ParseIntPipe,
 	Query,
@@ -91,6 +92,16 @@ export class CentersController {
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
 	@ApiOperation({ summary: "Update center" })
 	update(
+		@Param("id", ParseIntPipe) id: number,
+		@Body() dto: UpdateCenterDto,
+	) {
+		return this.centersService.update(id, dto);
+	}
+
+	@Put(":id")
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@ApiOperation({ summary: "Update center (legacy PUT)" })
+	updatePut(
 		@Param("id", ParseIntPipe) id: number,
 		@Body() dto: UpdateCenterDto,
 	) {

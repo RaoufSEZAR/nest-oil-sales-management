@@ -27,10 +27,23 @@ let ErpVehicleTripsService = class ErpVehicleTripsService {
         this.repo = repo;
         this.sequences = sequences;
     }
-    findAll() {
+    findAll(filters) {
+        const where = {};
+        if (filters?.vehicle_id)
+            where.vehicle = { id: filters.vehicle_id };
+        if (filters?.status)
+            where.status = filters.status;
         return this.repo.find({
+            where,
             order: { id: "DESC" },
             relations: { vehicle: true, salesRep: true },
+        });
+    }
+    async findActiveByVehicle(vehicleId) {
+        return this.repo.findOne({
+            where: { vehicle: { id: vehicleId }, status: trip_status_enum_1.TripStatus.ACTIVE },
+            relations: { vehicle: true, salesRep: true },
+            order: { id: "DESC" },
         });
     }
     async findOne(id) {

@@ -163,6 +163,12 @@ export class UsersService {
 		});
 	}
 
+	async findByPhoneNumber(phone: string): Promise<User | null> {
+		return this.usersRepository.findOne({
+			where: { phoneNumber: phone },
+		});
+	}
+
 	async update(
 		id: string,
 		updateUserDto: UpdateUserDto,
