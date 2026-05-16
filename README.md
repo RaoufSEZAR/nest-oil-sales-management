@@ -73,7 +73,7 @@ Oil Sales is a full-featured e-commerce backend application designed to handle p
   - Bank Transfer
   - Wallet
   - Cash on Delivery
-- ✅ **Payment Gateways** - Stripe, PayPal, Manual
+- ✅ **Payment Gateways** - Manual and in-app payment records
 - ✅ **Payment Status Tracking** - Pending, Completed, Failed, Refunded
 - ✅ **Payment Transactions** - Detailed transaction history
 - ✅ **Refund Management**
