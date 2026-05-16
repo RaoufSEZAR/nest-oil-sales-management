@@ -10,6 +10,7 @@ import {
 import { ApiProperty } from "@nestjs/swagger";
 import { UserRole, DEFAULT_USER_ROLE } from "src/users/enums/user-role.enum";
 import { Center } from "src/centers/entities/center.entity";
+import { Vehicle } from "src/vehicles/entities/vehicle.entity";
 
 @Entity("users")
 export class User {
@@ -88,6 +89,17 @@ export class User {
 	@ManyToOne(() => Center, (c) => c.users, { nullable: true })
 	@JoinColumn({ name: "center_id" })
 	center?: Center | null;
+
+	@ApiProperty({
+		description: "Legacy ERP vehicle assignment (integer FK to vehicles.id)",
+		required: false,
+	})
+	@Column({ name: "vehicle_id", type: "int", nullable: true })
+	vehicleId?: number | null;
+
+	@ManyToOne(() => Vehicle, { nullable: true })
+	@JoinColumn({ name: "vehicle_id" })
+	vehicle?: Vehicle | null;
 
 	@ApiProperty({ description: "Account creation date" })
 	@CreateDateColumn()

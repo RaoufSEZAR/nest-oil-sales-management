@@ -30,7 +30,7 @@ __decorate([
     __metadata("design:type", String)
 ], VehicleTrip.prototype, "tripNumber", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => vehicle_entity_1.Vehicle, { onDelete: "CASCADE" }),
+    (0, typeorm_1.ManyToOne)(() => vehicle_entity_1.Vehicle, (v) => v.trips, { onDelete: "CASCADE" }),
     (0, typeorm_1.JoinColumn)({ name: "vehicle_id" }),
     __metadata("design:type", vehicle_entity_1.Vehicle)
 ], VehicleTrip.prototype, "vehicle", void 0);

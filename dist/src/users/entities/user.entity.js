@@ -15,9 +15,10 @@ const typeorm_1 = require("typeorm");
 const swagger_1 = require("@nestjs/swagger");
 const user_role_enum_1 = require("../enums/user-role.enum");
 const center_entity_1 = require("../../centers/entities/center.entity");
+const vehicle_entity_1 = require("../../vehicles/entities/vehicle.entity");
 let User = class User {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => String }, email: { required: true, type: () => String }, password: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: false, type: () => String }, address: { required: false, type: () => String }, preferredLang: { required: false, type: () => String }, region: { required: false, type: () => String }, role: { required: true, enum: require("../enums/user-role.enum").UserRole }, isActive: { required: true, type: () => Boolean }, centerId: { required: false, type: () => Number, nullable: true }, center: { required: false, type: () => require("../../centers/entities/center.entity").Center, nullable: true }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } };
+        return { id: { required: true, type: () => String }, email: { required: true, type: () => String }, password: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: false, type: () => String }, address: { required: false, type: () => String }, preferredLang: { required: false, type: () => String }, region: { required: false, type: () => String }, role: { required: true, enum: require("../enums/user-role.enum").UserRole }, isActive: { required: true, type: () => Boolean }, centerId: { required: false, type: () => Number, nullable: true }, center: { required: false, type: () => require("../../centers/entities/center.entity").Center, nullable: true }, vehicleId: { required: false, type: () => Number, nullable: true }, vehicle: { required: false, type: () => require("../../vehicles/entities/vehicle.entity").Vehicle, nullable: true }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } };
     }
 };
 exports.User = User;
@@ -110,6 +111,19 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: "center_id" }),
     __metadata("design:type", center_entity_1.Center)
 ], User.prototype, "center", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: "Legacy ERP vehicle assignment (integer FK to vehicles.id)",
+        required: false,
+    }),
+    (0, typeorm_1.Column)({ name: "vehicle_id", type: "int", nullable: true }),
+    __metadata("design:type", Number)
+], User.prototype, "vehicleId", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => vehicle_entity_1.Vehicle, { nullable: true }),
+    (0, typeorm_1.JoinColumn)({ name: "vehicle_id" }),
+    __metadata("design:type", vehicle_entity_1.Vehicle)
+], User.prototype, "vehicle", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: "Account creation date" }),
     (0, typeorm_1.CreateDateColumn)(),

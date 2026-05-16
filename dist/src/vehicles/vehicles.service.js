@@ -19,11 +19,19 @@ const typeorm_2 = require("typeorm");
 const vehicle_entity_1 = require("./entities/vehicle.entity");
 const center_entity_1 = require("../centers/entities/center.entity");
 const user_entity_1 = require("../users/entities/user.entity");
+const vehicle_trip_entity_1 = require("../erp/entities/vehicle-trip.entity");
+const RECENT_TRIPS_LIMIT = 10;
 let VehiclesService = class VehiclesService {
-    constructor(vehiclesRepo, centersRepo, usersRepo) {
+    constructor(vehiclesRepo, centersRepo, usersRepo, tripsRepo) {
         this.vehiclesRepo = vehiclesRepo;
         this.centersRepo = centersRepo;
         this.usersRepo = usersRepo;
+        this.tripsRepo = tripsRepo;
+    }
+    stripRepPassword(vehicle) {
+        if (vehicle.currentSalesRep) {
+            delete vehicle.currentSalesRep.password;
+        }
     }
     async findAll(filters) {
         const qb = this.vehiclesRepo
@@ -39,9 +47,7 @@ let VehiclesService = class VehiclesService {
         }
         const rows = await qb.getMany();
         for (const v of rows) {
-            if (v.currentSalesRep) {
-                delete v.currentSalesRep.password;
-            }
+            this.stripRepPassword(v);
         }
         return rows;
     }
@@ -53,9 +59,12 @@ let VehiclesService = class VehiclesService {
         if (!vehicle) {
             throw new common_1.NotFoundException("Vehicle not found");
         }
-        if (vehicle.currentSalesRep) {
-            delete vehicle.currentSalesRep.password;
-        }
+        vehicle.trips = await this.tripsRepo.find({
+            where: { vehicle: { id } },
+            order: { tripDate: "DESC" },
+            take: RECENT_TRIPS_LIMIT,
+        });
+        this.stripRepPassword(vehicle);
         return vehicle;
     }
     async create(dto) {
@@ -86,7 +95,8 @@ let VehiclesService = class VehiclesService {
             vehicleType: dto.vehicleType ?? null,
             active: true,
         });
-        return this.vehiclesRepo.save(vehicle);
+        const saved = await this.vehiclesRepo.save(vehicle);
+        return this.findOne(saved.id);
     }
     async update(id, dto) {
         const vehicle = await this.vehiclesRepo.findOne({ where: { id } });
@@ -130,7 +140,8 @@ let VehiclesService = class VehiclesService {
             ...(dto.vehicleType !== undefined && { vehicleType: dto.vehicleType }),
             ...(dto.active !== undefined && { active: dto.active }),
         });
-        return this.vehiclesRepo.save(vehicle);
+        await this.vehiclesRepo.save(vehicle);
+        return this.findOne(id);
     }
 };
 exports.VehiclesService = VehiclesService;
@@ -139,7 +150,9 @@ exports.VehiclesService = VehiclesService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(vehicle_entity_1.Vehicle)),
     __param(1, (0, typeorm_1.InjectRepository)(center_entity_1.Center)),
     __param(2, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(3, (0, typeorm_1.InjectRepository)(vehicle_trip_entity_1.VehicleTrip)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])
 ], VehiclesService);

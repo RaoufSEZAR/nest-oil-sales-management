@@ -12,6 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const vehicle_entity_1 = require("./entities/vehicle.entity");
 const center_entity_1 = require("../centers/entities/center.entity");
 const user_entity_1 = require("../users/entities/user.entity");
+const vehicle_trip_entity_1 = require("../erp/entities/vehicle-trip.entity");
 const vehicles_service_1 = require("./vehicles.service");
 const vehicles_controller_1 = require("./vehicles.controller");
 let VehiclesModule = class VehiclesModule {
@@ -19,7 +20,7 @@ let VehiclesModule = class VehiclesModule {
 exports.VehiclesModule = VehiclesModule;
 exports.VehiclesModule = VehiclesModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([vehicle_entity_1.Vehicle, center_entity_1.Center, user_entity_1.User])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([vehicle_entity_1.Vehicle, center_entity_1.Center, user_entity_1.User, vehicle_trip_entity_1.VehicleTrip])],
         controllers: [vehicles_controller_1.VehiclesController],
         providers: [vehicles_service_1.VehiclesService],
         exports: [vehicles_service_1.VehiclesService],

@@ -15,9 +15,10 @@ const typeorm_1 = require("typeorm");
 const swagger_1 = require("@nestjs/swagger");
 const center_entity_1 = require("../../centers/entities/center.entity");
 const user_entity_1 = require("../../users/entities/user.entity");
+const vehicle_trip_entity_1 = require("../../erp/entities/vehicle-trip.entity");
 let Vehicle = class Vehicle {
     static _OPENAPI_METADATA_FACTORY() {
-        return { id: { required: true, type: () => Number }, name: { required: true, type: () => String }, code: { required: true, type: () => String }, licensePlate: { required: false, type: () => String, nullable: true }, centerId: { required: true, type: () => Number }, center: { required: true, type: () => require("../../centers/entities/center.entity").Center }, currentSalesRepId: { required: false, type: () => String, nullable: true }, currentSalesRep: { required: false, type: () => require("../../users/entities/user.entity").User, nullable: true }, vehicleType: { required: false, type: () => String, nullable: true }, active: { required: true, type: () => Boolean }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } };
+        return { id: { required: true, type: () => Number }, name: { required: true, type: () => String }, code: { required: true, type: () => String }, licensePlate: { required: false, type: () => String, nullable: true }, centerId: { required: true, type: () => Number }, center: { required: true, type: () => require("../../centers/entities/center.entity").Center }, currentSalesRepId: { required: false, type: () => String, nullable: true }, currentSalesRep: { required: false, type: () => require("../../users/entities/user.entity").User, nullable: true }, trips: { required: false, type: () => [require("../../erp/entities/vehicle-trip.entity").VehicleTrip] }, vehicleType: { required: false, type: () => String, nullable: true }, active: { required: true, type: () => Boolean }, createdAt: { required: true, type: () => Date }, updatedAt: { required: true, type: () => Date } };
     }
 };
 exports.Vehicle = Vehicle;
@@ -61,6 +62,10 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: "current_sales_rep_id" }),
     __metadata("design:type", user_entity_1.User)
 ], Vehicle.prototype, "currentSalesRep", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => vehicle_trip_entity_1.VehicleTrip, (trip) => trip.vehicle),
+    __metadata("design:type", Array)
+], Vehicle.prototype, "trips", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ required: false }),
     (0, typeorm_1.Column)({ name: "vehicle_type", type: "varchar", length: 50, nullable: true }),

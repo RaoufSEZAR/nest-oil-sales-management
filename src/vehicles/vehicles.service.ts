@@ -9,8 +9,11 @@ import { Repository } from "typeorm";
 import { Vehicle } from "src/vehicles/entities/vehicle.entity";
 import { Center } from "src/centers/entities/center.entity";
 import { User } from "src/users/entities/user.entity";
+import { VehicleTrip } from "src/erp/entities/vehicle-trip.entity";
 import { CreateVehicleDto } from "src/vehicles/dto/create-vehicle.dto";
 import { UpdateVehicleDto } from "src/vehicles/dto/update-vehicle.dto";
+
+const RECENT_TRIPS_LIMIT = 10;
 
 @Injectable()
 export class VehiclesService {
@@ -21,7 +24,15 @@ export class VehiclesService {
 		private readonly centersRepo: Repository<Center>,
 		@InjectRepository(User)
 		private readonly usersRepo: Repository<User>,
+		@InjectRepository(VehicleTrip)
+		private readonly tripsRepo: Repository<VehicleTrip>,
 	) {}
+
+	private stripRepPassword(vehicle: Vehicle): void {
+		if (vehicle.currentSalesRep) {
+			delete (vehicle.currentSalesRep as { password?: string }).password;
+		}
+	}
 
 	async findAll(filters: {
 		centerId?: number;
@@ -42,9 +53,7 @@ export class VehiclesService {
 
 		const rows = await qb.getMany();
 		for (const v of rows) {
-			if (v.currentSalesRep) {
-				delete (v.currentSalesRep as { password?: string }).password;
-			}
+			this.stripRepPassword(v);
 		}
 		return rows;
 	}
@@ -57,9 +66,14 @@ export class VehiclesService {
 		if (!vehicle) {
 			throw new NotFoundException("Vehicle not found");
 		}
-		if (vehicle.currentSalesRep) {
-			delete (vehicle.currentSalesRep as { password?: string }).password;
-		}
+
+		vehicle.trips = await this.tripsRepo.find({
+			where: { vehicle: { id } },
+			order: { tripDate: "DESC" },
+			take: RECENT_TRIPS_LIMIT,
+		});
+
+		this.stripRepPassword(vehicle);
 		return vehicle;
 	}
 
@@ -92,7 +106,8 @@ export class VehiclesService {
 			vehicleType: dto.vehicleType ?? null,
 			active: true,
 		});
-		return this.vehiclesRepo.save(vehicle);
+		const saved = await this.vehiclesRepo.save(vehicle);
+		return this.findOne(saved.id);
 	}
 
 	async update(id: number, dto: UpdateVehicleDto): Promise<Vehicle> {
@@ -139,6 +154,7 @@ export class VehiclesService {
 			...(dto.active !== undefined && { active: dto.active }),
 		});
 
-		return this.vehiclesRepo.save(vehicle);
+		await this.vehiclesRepo.save(vehicle);
+		return this.findOne(id);
 	}
 }

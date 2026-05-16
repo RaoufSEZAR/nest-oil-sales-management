@@ -1,5 +1,6 @@
 import { UserRole } from "src/users/enums/user-role.enum";
 import { Center } from "src/centers/entities/center.entity";
+import { Vehicle } from "src/vehicles/entities/vehicle.entity";
 export declare class User {
     id: string;
     email: string;
@@ -14,6 +15,8 @@ export declare class User {
     isActive: boolean;
     centerId?: number | null;
     center?: Center | null;
+    vehicleId?: number | null;
+    vehicle?: Vehicle | null;
     createdAt: Date;
     updatedAt: Date;
 }

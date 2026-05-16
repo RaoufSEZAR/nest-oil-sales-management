@@ -19,7 +19,7 @@ export class VehicleTrip {
 	@Column({ name: "trip_number", type: "varchar", length: 50, unique: true })
 	tripNumber: string;
 
-	@ManyToOne(() => Vehicle, { onDelete: "CASCADE" })
+	@ManyToOne(() => Vehicle, (v) => v.trips, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "vehicle_id" })
 	vehicle: Vehicle;
 
