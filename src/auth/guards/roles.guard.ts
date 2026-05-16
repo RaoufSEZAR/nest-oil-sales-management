@@ -32,8 +32,8 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    // Check if user has admin role - admins can access everything
-    if (user.role === UserRole.ADMIN) {
+    // Admin and super admin bypass role checks (full access)
+    if (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN) {
       return true;
     }
 

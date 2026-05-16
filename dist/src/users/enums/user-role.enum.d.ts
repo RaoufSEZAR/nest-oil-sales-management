@@ -5,3 +5,4 @@ export declare enum UserRole {
     MANAGER = "manager"
 }
 export declare const DEFAULT_USER_ROLE = UserRole.USER;
+export declare const USER_MANAGEMENT_ROLES: readonly [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER];

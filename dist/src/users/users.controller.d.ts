@@ -2,6 +2,7 @@ import { UsersService } from "src/users/users.service";
 import { CreateUserDto } from "src/users/dto/create-user.dto";
 import { UpdateUserDto } from "src/users/dto/update-user.dto";
 import { User } from "src/users/entities/user.entity";
+import { UserRole } from "src/users/enums/user-role.enum";
 export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
@@ -14,7 +15,11 @@ export declare class UsersController {
         totalPages: number;
     }>;
     findOne(id: string): Promise<User>;
-    update(id: string, updateUserDto: UpdateUserDto): Promise<User>;
+    update(id: string, updateUserDto: UpdateUserDto, req: {
+        user: {
+            role: UserRole;
+        };
+    }): Promise<User>;
     remove(id: string): Promise<void>;
     deactivate(id: string): Promise<User>;
     activate(id: string): Promise<User>;

@@ -143,7 +143,11 @@ export class UsersService {
 		});
 	}
 
-	async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+	async update(
+		id: string,
+		updateUserDto: UpdateUserDto,
+		options?: { allowStaffPasswordReset?: boolean },
+	): Promise<User> {
 		const user = await this.findOne(id);
 
 		// Check if email is being updated and if it already exists
@@ -157,32 +161,30 @@ export class UsersService {
 			}
 		}
 
-		// If password is being updated, verify old password
 		if (updateUserDto.password) {
-			if (!updateUserDto.oldPassword) {
-				throw new BadRequestException(
-					"Old password is required when changing password",
-				);
-			}
-
-			// Get user with password to verify
-			const userWithPassword = await this.findOneWithPassword(id);
-
-			// Trim old password to remove any whitespace
-			const trimmedOldPassword = updateUserDto.oldPassword.trim();
-
-			// Verify old password
-			const isOldPasswordValid = await bcrypt.compare(
-				trimmedOldPassword,
-				userWithPassword.password,
-			);
-			if (!isOldPasswordValid) {
-				throw new UnauthorizedException("Old password is incorrect");
-			}
-
-			// Hash new password (trim it first)
 			const trimmedNewPassword = updateUserDto.password.trim();
-			updateUserDto.password = await bcrypt.hash(trimmedNewPassword, 10);
+
+			if (options?.allowStaffPasswordReset && !updateUserDto.oldPassword) {
+				updateUserDto.password = await bcrypt.hash(trimmedNewPassword, 10);
+			} else {
+				if (!updateUserDto.oldPassword) {
+					throw new BadRequestException(
+						"Old password is required when changing password",
+					);
+				}
+
+				const userWithPassword = await this.findOneWithPassword(id);
+				const trimmedOldPassword = updateUserDto.oldPassword.trim();
+				const isOldPasswordValid = await bcrypt.compare(
+					trimmedOldPassword,
+					userWithPassword.password,
+				);
+				if (!isOldPasswordValid) {
+					throw new UnauthorizedException("Old password is incorrect");
+				}
+
+				updateUserDto.password = await bcrypt.hash(trimmedNewPassword, 10);
+			}
 		}
 
 		// Remove oldPassword from DTO before saving (it's not a database field)

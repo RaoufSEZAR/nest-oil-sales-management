@@ -29,7 +29,11 @@ let UsersService = class UsersService {
         if (existingUser) {
             throw new common_1.ConflictException("User with this email already exists");
         }
-        const user = this.usersRepository.create(createUserDto);
+        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+        const user = this.usersRepository.create({
+            ...createUserDto,
+            password: hashedPassword,
+        });
         return this.usersRepository.save(user);
     }
     async findAll(page = 1, limit = 10) {
@@ -45,9 +49,11 @@ let UsersService = class UsersService {
                 "address",
                 "preferredLang",
                 "region",
+                "centerId",
                 "createdAt",
                 "updatedAt",
             ],
+            relations: ["center"],
             skip: (page - 1) * limit,
             take: limit,
             order: { createdAt: "DESC" },
@@ -115,7 +121,7 @@ let UsersService = class UsersService {
             where: { email },
         });
     }
-    async update(id, updateUserDto) {
+    async update(id, updateUserDto, options) {
         const user = await this.findOne(id);
         if (updateUserDto.email && updateUserDto.email !== user.email) {
             const existingUser = await this.usersRepository.findOne({
@@ -126,17 +132,22 @@ let UsersService = class UsersService {
             }
         }
         if (updateUserDto.password) {
-            if (!updateUserDto.oldPassword) {
-                throw new common_1.BadRequestException("Old password is required when changing password");
-            }
-            const userWithPassword = await this.findOneWithPassword(id);
-            const trimmedOldPassword = updateUserDto.oldPassword.trim();
-            const isOldPasswordValid = await bcrypt.compare(trimmedOldPassword, userWithPassword.password);
-            if (!isOldPasswordValid) {
-                throw new common_1.UnauthorizedException("Old password is incorrect");
-            }
             const trimmedNewPassword = updateUserDto.password.trim();
-            updateUserDto.password = await bcrypt.hash(trimmedNewPassword, 10);
+            if (options?.allowStaffPasswordReset && !updateUserDto.oldPassword) {
+                updateUserDto.password = await bcrypt.hash(trimmedNewPassword, 10);
+            }
+            else {
+                if (!updateUserDto.oldPassword) {
+                    throw new common_1.BadRequestException("Old password is required when changing password");
+                }
+                const userWithPassword = await this.findOneWithPassword(id);
+                const trimmedOldPassword = updateUserDto.oldPassword.trim();
+                const isOldPasswordValid = await bcrypt.compare(trimmedOldPassword, userWithPassword.password);
+                if (!isOldPasswordValid) {
+                    throw new common_1.UnauthorizedException("Old password is incorrect");
+                }
+                updateUserDto.password = await bcrypt.hash(trimmedNewPassword, 10);
+            }
         }
         const { oldPassword, ...updateData } = updateUserDto;
         Object.assign(user, updateData);

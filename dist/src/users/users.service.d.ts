@@ -16,7 +16,9 @@ export declare class UsersService {
     findOne(id: string): Promise<User>;
     findOneWithPassword(id: string): Promise<User>;
     findByEmail(email: string): Promise<User>;
-    update(id: string, updateUserDto: UpdateUserDto): Promise<User>;
+    update(id: string, updateUserDto: UpdateUserDto, options?: {
+        allowStaffPasswordReset?: boolean;
+    }): Promise<User>;
     remove(id: string): Promise<void>;
     deactivate(id: string): Promise<User>;
     activate(id: string): Promise<User>;

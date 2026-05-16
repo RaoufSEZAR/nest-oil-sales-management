@@ -37,7 +37,7 @@ let RolesGuard = class RolesGuard {
         if (!user) {
             throw new common_1.ForbiddenException('User not authenticated');
         }
-        if (user.role === user_role_enum_1.UserRole.ADMIN) {
+        if (user.role === user_role_enum_1.UserRole.ADMIN || user.role === user_role_enum_1.UserRole.SUPER_ADMIN) {
             return true;
         }
         if (requiredRoles.includes(user_role_enum_1.UserRole.USER) && params.id && params.id === user.userId) {

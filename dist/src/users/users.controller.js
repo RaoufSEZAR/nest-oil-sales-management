@@ -39,8 +39,9 @@ let UsersController = class UsersController {
     findOne(id) {
         return this.usersService.findOne(id);
     }
-    update(id, updateUserDto) {
-        return this.usersService.update(id, updateUserDto);
+    update(id, updateUserDto, req) {
+        const allowStaffPasswordReset = user_role_enum_1.USER_MANAGEMENT_ROLES.some((role) => role === req.user.role);
+        return this.usersService.update(id, updateUserDto, { allowStaffPasswordReset });
     }
     remove(id) {
         return this.usersService.remove(id);
@@ -55,12 +56,12 @@ let UsersController = class UsersController {
 exports.UsersController = UsersController;
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Create a new user (Admin only)' }),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
+    (0, swagger_1.ApiOperation)({ summary: 'Create a new user (admin, super admin, or manager)' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'User created successfully', type: user_entity_1.User }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Bad request' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: 'User already exists' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied. Admin role required' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
     openapi.ApiResponse({ status: 201, type: require("./entities/user.entity").User }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -69,8 +70,8 @@ __decorate([
 ], UsersController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all users (Admin only)' }),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all users (admin, super admin, or manager)' }),
     (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' }),
     (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10)' }),
     (0, swagger_1.ApiResponse)({
@@ -87,7 +88,7 @@ __decorate([
             }
         }
     }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied. Admin role required' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Query)('page')),
     __param(1, (0, common_1.Query)('limit')),
@@ -97,8 +98,8 @@ __decorate([
 ], UsersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    (0, swagger_1.ApiOperation)({ summary: 'Get user by ID (Admin or own profile)' }),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES, user_role_enum_1.UserRole.USER),
+    (0, swagger_1.ApiOperation)({ summary: 'Get user by ID (staff managers or own profile)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User found', type: user_entity_1.User }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
     (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
@@ -110,8 +111,8 @@ __decorate([
 ], UsersController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    (0, swagger_1.ApiOperation)({ summary: 'Update user (Admin or own profile)' }),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES, user_role_enum_1.UserRole.USER),
+    (0, swagger_1.ApiOperation)({ summary: 'Update user (staff managers or own profile)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User updated successfully', type: user_entity_1.User }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already exists' }),
@@ -119,17 +120,18 @@ __decorate([
     openapi.ApiResponse({ status: 200, type: require("./entities/user.entity").User }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto, Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.USER),
-    (0, swagger_1.ApiOperation)({ summary: 'Delete user (Admin or own profile)' }),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES, user_role_enum_1.UserRole.USER),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user (staff managers or own profile)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User deleted successfully' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied. Admin role required or can only delete own profile' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -138,11 +140,11 @@ __decorate([
 ], UsersController.prototype, "remove", null);
 __decorate([
     (0, common_1.Patch)(':id/deactivate'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Deactivate user (Admin only)' }),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
+    (0, swagger_1.ApiOperation)({ summary: 'Deactivate user (admin, super admin, or manager)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User deactivated successfully', type: user_entity_1.User }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied. Admin role required' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
     openapi.ApiResponse({ status: 200, type: require("./entities/user.entity").User }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -151,11 +153,11 @@ __decorate([
 ], UsersController.prototype, "deactivate", null);
 __decorate([
     (0, common_1.Patch)(':id/activate'),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: 'Activate user (Admin only)' }),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
+    (0, swagger_1.ApiOperation)({ summary: 'Activate user (admin, super admin, or manager)' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User activated successfully', type: user_entity_1.User }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied. Admin role required' }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: 'Access denied' }),
     openapi.ApiResponse({ status: 200, type: require("./entities/user.entity").User }),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
