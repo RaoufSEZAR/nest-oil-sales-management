@@ -1,8 +1,9 @@
 import {
 	ConflictException,
 	Injectable,
+	Logger,
 	NotFoundException,
-	OnModuleInit,
+	OnApplicationBootstrap,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -23,7 +24,9 @@ const DEFAULT_CATEGORIES = [
 ];
 
 @Injectable()
-export class ErpExpenseCategoriesService implements OnModuleInit {
+export class ErpExpenseCategoriesService implements OnApplicationBootstrap {
+	private readonly logger = new Logger(ErpExpenseCategoriesService.name);
+
 	constructor(
 		@InjectRepository(ExpenseCategory)
 		private readonly categories: Repository<ExpenseCategory>,
@@ -31,16 +34,24 @@ export class ErpExpenseCategoriesService implements OnModuleInit {
 		private readonly expenses: Repository<Expense>,
 	) {}
 
-	async onModuleInit(): Promise<void> {
-		const count = await this.categories.count();
-		if (count > 0) return;
-		for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
-			await this.categories.save(
-				this.categories.create({
-					name: DEFAULT_CATEGORIES[i],
-					sortOrder: i,
-					active: true,
-				}),
+	async onApplicationBootstrap(): Promise<void> {
+		try {
+			const count = await this.categories.count();
+			if (count > 0) return;
+			for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
+				await this.categories.save(
+					this.categories.create({
+						name: DEFAULT_CATEGORIES[i],
+						sortOrder: i,
+						active: true,
+					}),
+				);
+			}
+			this.logger.log(`Seeded ${DEFAULT_CATEGORIES.length} default expense categories`);
+		} catch (err) {
+			this.logger.error(
+				"Could not seed expense categories (tables may be missing). Redeploy after DB is ready.",
+				err instanceof Error ? err.stack : String(err),
 			);
 		}
 	}

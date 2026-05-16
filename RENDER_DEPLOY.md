@@ -140,14 +140,13 @@ DB_USERNAME=oil_sales_db_user
 DB_PASSWORD=Cwjq8c1YE0CSsjDDX4iQ8M4Wuan7urSu
 DB_NAME=oil_sales_db
 DB_SSL=true
-DB_SYNCHRONIZE=true
 JWT_SECRET=<generate: openssl rand -base64 48>
 JWT_EXPIRES_IN=24h
 ```
 
 Do **not** commit `DB_PASSWORD` or `JWT_SECRET` to a public repo. Set them in the Render dashboard only.
 
-After the first successful deploy, set **`DB_SYNCHRONIZE=false`**.
+Optional after DB is stable: `DB_SYNCHRONIZE=false`
 
 ### Connect from your PC (schema import / psql)
 
@@ -179,26 +178,19 @@ pg_dump -h localhost -p 5433 -U postgres -d oil-sales-app --no-owner --no-acl | 
 
 On first deploy, Render Postgres is **empty**. The API needs tables before startup (e.g. `expense_categories` seed on boot). Error **`42P01`** = relation does not exist.
 
-### First deploy: enable `DB_SYNCHRONIZE`
+### First deploy: schema sync (automatic)
 
-Add to Render Web Service → **Environment**:
-
-```env
-DB_SYNCHRONIZE=true
-```
-
-TypeORM will create all tables on startup when this is `true` (even with `NODE_ENV=production`).
-
-1. Deploy and confirm the service stays **Live** (`/api/v1/health` returns OK).
-2. Set **`DB_SYNCHRONIZE=false`** (or remove the variable) and redeploy so schema is not auto-altered on every restart.
-
-Also include in your env block:
+TypeORM **creates tables automatically** on startup unless you set:
 
 ```env
-DB_SYNCHRONIZE=true
+DB_SYNCHRONIZE=false
 ```
 
-(alongside `DB_HOST`, `DB_SSL`, etc.)
+You do **not** need `DB_SYNCHRONIZE=true` on Render (the `production.env` file is not in the Docker image). Sync is **on by default**.
+
+1. Push the latest BK code and redeploy.
+2. Confirm `/api/v1/health` returns OK.
+3. When the database is stable, add **`DB_SYNCHRONIZE=false`** in Render → Environment and redeploy (recommended for long-term production).
 
 ### Alternative: import from local dev
 

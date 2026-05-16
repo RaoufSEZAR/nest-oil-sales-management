@@ -32,7 +32,9 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
-                envFilePath: "config.env",
+                envFilePath: process.env.NODE_ENV === "production"
+                    ? ["production.env", "config.env"]
+                    : "config.env",
             }),
             throttler_1.ThrottlerModule.forRoot([
                 {
@@ -51,7 +53,7 @@ exports.AppModule = AppModule = __decorate([
                     database: configService.get("DB_NAME"),
                     entities: [user_entity_1.User, center_entity_1.Center, vehicle_entity_1.Vehicle, product_entity_1.Product, product_entity_1.Inventory],
                     autoLoadEntities: true,
-                    synchronize: configService.get("NODE_ENV") !== "production",
+                    synchronize: configService.get("DB_SYNCHRONIZE") !== "false",
                     logging: configService.get("NODE_ENV") === "development",
                     ssl: configService.get("DB_SSL") === "true"
                         ? { rejectUnauthorized: false }

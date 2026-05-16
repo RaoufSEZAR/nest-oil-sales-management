@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var ErpExpenseCategoriesService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErpExpenseCategoriesService = void 0;
 const common_1 = require("@nestjs/common");
@@ -26,21 +27,28 @@ const DEFAULT_CATEGORIES = [
     "دفعة مورد",
     "متنوع",
 ];
-let ErpExpenseCategoriesService = class ErpExpenseCategoriesService {
+let ErpExpenseCategoriesService = ErpExpenseCategoriesService_1 = class ErpExpenseCategoriesService {
     constructor(categories, expenses) {
         this.categories = categories;
         this.expenses = expenses;
+        this.logger = new common_1.Logger(ErpExpenseCategoriesService_1.name);
     }
-    async onModuleInit() {
-        const count = await this.categories.count();
-        if (count > 0)
-            return;
-        for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
-            await this.categories.save(this.categories.create({
-                name: DEFAULT_CATEGORIES[i],
-                sortOrder: i,
-                active: true,
-            }));
+    async onApplicationBootstrap() {
+        try {
+            const count = await this.categories.count();
+            if (count > 0)
+                return;
+            for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
+                await this.categories.save(this.categories.create({
+                    name: DEFAULT_CATEGORIES[i],
+                    sortOrder: i,
+                    active: true,
+                }));
+            }
+            this.logger.log(`Seeded ${DEFAULT_CATEGORIES.length} default expense categories`);
+        }
+        catch (err) {
+            this.logger.error("Could not seed expense categories (tables may be missing). Redeploy after DB is ready.", err instanceof Error ? err.stack : String(err));
         }
     }
     findAll(includeInactive = false) {
@@ -115,7 +123,7 @@ let ErpExpenseCategoriesService = class ErpExpenseCategoriesService {
     }
 };
 exports.ErpExpenseCategoriesService = ErpExpenseCategoriesService;
-exports.ErpExpenseCategoriesService = ErpExpenseCategoriesService = __decorate([
+exports.ErpExpenseCategoriesService = ErpExpenseCategoriesService = ErpExpenseCategoriesService_1 = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(expense_category_entity_1.ExpenseCategory)),
     __param(1, (0, typeorm_1.InjectRepository)(expense_entity_1.Expense)),

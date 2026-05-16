@@ -42,9 +42,8 @@ import { APP_GUARD } from "@nestjs/core";
 				database: configService.get("DB_NAME"),
 				entities: [User, Center, Vehicle, Product, Inventory],
 				autoLoadEntities: true,
-				synchronize:
-					configService.get("DB_SYNCHRONIZE") === "true" ||
-					configService.get("NODE_ENV") !== "production",
+				// Sync unless explicitly disabled (Render has no production.env file — default on for empty DB)
+				synchronize: configService.get("DB_SYNCHRONIZE") !== "false",
 				logging: configService.get("NODE_ENV") === "development",
 				ssl:
 					configService.get("DB_SSL") === "true"

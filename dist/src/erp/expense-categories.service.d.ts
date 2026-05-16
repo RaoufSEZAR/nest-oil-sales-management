@@ -1,13 +1,14 @@
-import { OnModuleInit } from "@nestjs/common";
+import { OnApplicationBootstrap } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { ExpenseCategory } from "src/erp/entities/expense-category.entity";
 import { Expense } from "src/erp/entities/expense.entity";
 import { CreateExpenseCategoryDto, UpdateExpenseCategoryDto } from "src/erp/dto/expense-category.dto";
-export declare class ErpExpenseCategoriesService implements OnModuleInit {
+export declare class ErpExpenseCategoriesService implements OnApplicationBootstrap {
     private readonly categories;
     private readonly expenses;
+    private readonly logger;
     constructor(categories: Repository<ExpenseCategory>, expenses: Repository<Expense>);
-    onModuleInit(): Promise<void>;
+    onApplicationBootstrap(): Promise<void>;
     findAll(includeInactive?: boolean): Promise<ExpenseCategory[]>;
     findAllForAdmin(): Promise<ExpenseCategory[]>;
     getActiveNames(): Promise<string[]>;
