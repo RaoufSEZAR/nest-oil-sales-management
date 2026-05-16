@@ -29,7 +29,11 @@ export class UsersService {
 			throw new ConflictException("User with this email already exists");
 		}
 
-		const user = this.usersRepository.create(createUserDto);
+		const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+		const user = this.usersRepository.create({
+			...createUserDto,
+			password: hashedPassword,
+		});
 		return this.usersRepository.save(user);
 	}
 
@@ -55,9 +59,11 @@ export class UsersService {
 				"address",
 				"preferredLang",
 				"region",
+				"centerId",
 				"createdAt",
 				"updatedAt",
 			],
+			relations: ["center"],
 			skip: (page - 1) * limit,
 			take: limit,
 			order: { createdAt: "DESC" },
