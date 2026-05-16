@@ -43,14 +43,22 @@ export class ErpInventoryTransfersController {
 
 	@Post()
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-	@ApiOperation({ summary: "Create transfer with line items" })
+	@ApiOperation({
+		summary: "Create transfer with line items",
+		description:
+			"If status is **completed** on create, decreases **product stock** per line immediately.",
+	})
 	create(@Body() dto: CreateInventoryTransferDto) {
 		return this.transfers.create(dto);
 	}
 
 	@Patch(":id")
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-	@ApiOperation({ summary: "Update transfer status / receiver" })
+	@ApiOperation({
+		summary: "Update transfer status / receiver",
+		description:
+			"When status changes to **completed**, decreases **product stock** for each line (once).",
+	})
 	update(
 		@Param("id", ParseIntPipe) id: number,
 		@Body() dto: UpdateInventoryTransferDto,

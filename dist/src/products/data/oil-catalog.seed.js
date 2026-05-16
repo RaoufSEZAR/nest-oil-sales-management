@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OIL_CATALOG_PRODUCTS = void 0;
+exports.OIL_CATALOG_PRODUCTS = exports.OIL_CATALOG_DEFAULT_STOCK = void 0;
+exports.OIL_CATALOG_DEFAULT_STOCK = 500;
 const OIL_CATALOG_ROWS = [
     {
         name: "0/20 4 لتر تنك",
@@ -289,5 +290,5 @@ const OIL_CATALOG_ROWS = [
         price: 2.75,
     },
 ];
-exports.OIL_CATALOG_PRODUCTS = OIL_CATALOG_ROWS.map((row) => ({ ...row, stock: 500 }));
+exports.OIL_CATALOG_PRODUCTS = OIL_CATALOG_ROWS.map((row) => ({ ...row, stock: exports.OIL_CATALOG_DEFAULT_STOCK }));
 //# sourceMappingURL=oil-catalog.seed.js.map

@@ -39,7 +39,10 @@ export class ErpReturnsController {
 
 	@Post()
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-	@ApiOperation({ summary: "Create sales return" })
+	@ApiOperation({
+		summary: "Create sales return",
+		description: "Increases **product stock** by each return line quantity.",
+	})
 	create(@Body() dto: CreateSalesReturnDto) {
 		return this.returns.create(dto);
 	}

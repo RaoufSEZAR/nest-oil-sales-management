@@ -66,7 +66,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: "Create purchase with line items" }),
+    (0, swagger_1.ApiOperation)({
+        summary: "Create purchase with line items",
+        description: "Increases **product stock** for each line that includes a `productId`.",
+    }),
     openapi.ApiResponse({ status: 201, type: require("./entities/purchase.entity").Purchase }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -87,7 +90,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)(":id/distributions"),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: "Record stock distribution for a purchase" }),
+    (0, swagger_1.ApiOperation)({
+        summary: "Record stock distribution for a purchase",
+        description: "Decreases **product stock** by the distributed quantity when sending stock to a center.",
+    }),
     openapi.ApiResponse({ status: 201, type: require("./entities/purchase-distribution.entity").PurchaseDistribution }),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),

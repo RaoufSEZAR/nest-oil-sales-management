@@ -14,6 +14,7 @@ import {
 	BulkUpsertProductsResultDto,
 } from "src/products/dto/bulk-upsert-result.dto";
 import { Product, Inventory } from "src/products/entities/product.entity";
+import { AdjustProductStockDto } from "src/products/dto/adjust-product-stock.dto";
 import { SwaggerTags } from "src/swagger/api-tags";
 
 const extraModels = [
@@ -30,6 +31,7 @@ const extraModels = [
 	BulkUpsertProductsDto,
 	BulkUpsertProductsResultDto,
 	BulkUpsertProductErrorDto,
+	AdjustProductStockDto,
 ];
 
 /** Shown in Swagger UI so you can confirm the running process picked up latest routes */
@@ -53,17 +55,24 @@ export function buildOpenApiDocument(app: INestApplication): OpenAPIObject {
 				"| **Users** | User CRUD and activation (JWT + roles) |",
 				"| **Centers** | Distribution centers (branches, managers, parent/child) |",
 				"| **Vehicles** | Fleet vehicles per center |",
-				"| **Products** | Catalog, `POST /products/bulk`, `POST /products/seed/oil-catalog`, inventory, soft delete |",
+				"| **Products** | Catalog with required **`stock`**, bulk/seed import, `PATCH …/stock/increase|decrease`, per-location `inventory` rows |",
 				"| **ERP — Customers** | Customer master data |",
-				"| **ERP — Invoices** | Sales invoices and line items |",
-				"| **ERP — Sales returns** | Returns linked to customers / invoices |",
+				"| **ERP — Invoices** | Sales invoices (line items **decrease** product `stock`) |",
+				"| **ERP — Sales returns** | Returns (**increase** product `stock`) |",
 				"| **ERP — Payments** | Customer payments |",
 				"| **ERP — Vehicle trips** | Trip logs and odometer |",
 				"| **ERP — Expenses** | Center expenses |",
-				"| **ERP — Purchases** | Supplier POs, lines, distributions |",
+				"| **ERP — Purchases** | POs (**increase** stock); distributions (**decrease** stock) |",
 				"| **ERP — Currency exchanges** | FX desk operations |",
-				"| **ERP — Inventory transfers** | Stock moves between centers / vehicles |",
+				"| **ERP — Inventory transfers** | Inter-location moves (**decrease** stock when status = completed) |",
 				"| **ERP — Cash handovers** | Cash custody transfers |",
+				"",
+				"### Product stock",
+				"",
+				"- **`stock`** on `Product` is required on create/bulk (`number`, ≥ 0).",
+				"- Manual adjust: `PATCH /products/{id}/stock/increase` or `…/decrease` with `{ \"quantity\": n }`.",
+				"- Oil seed (`POST /products/seed/oil-catalog`) sets each SKU to catalog default stock (500).",
+				"- ERP documents adjust stock automatically (see tags above); insufficient stock returns **400**.",
 			].join("\n"),
 		)
 		.setVersion("1.0")
@@ -75,17 +84,29 @@ export function buildOpenApiDocument(app: INestApplication): OpenAPIObject {
 		.addTag(SwaggerTags.Vehicles, "Vehicles assigned to centers")
 		.addTag(
 			SwaggerTags.Products,
-			"Product catalog, bulk import (`POST /products/bulk`), one-click oil seed (`POST /products/seed/oil-catalog`), inventory rows, soft delete",
+			"Catalog with required stock, bulk/seed import, stock increase/decrease, location inventory rows",
 		)
 		.addTag(SwaggerTags.ErpCustomers, "Customer master data")
-		.addTag(SwaggerTags.ErpInvoices, "Sales invoices and line items")
-		.addTag(SwaggerTags.ErpSalesReturns, "Returns and line items")
+		.addTag(
+			SwaggerTags.ErpInvoices,
+			"Sales invoices; creating an invoice decreases product stock per line",
+		)
+		.addTag(
+			SwaggerTags.ErpSalesReturns,
+			"Sales returns; creating a return increases product stock per line",
+		)
 		.addTag(SwaggerTags.ErpPayments, "Customer payments")
 		.addTag(SwaggerTags.ErpVehicleTrips, "Trip logs and odometer")
 		.addTag(SwaggerTags.ErpExpenses, "Operating expenses")
-		.addTag(SwaggerTags.ErpPurchases, "Purchase orders and distributions")
+		.addTag(
+			SwaggerTags.ErpPurchases,
+			"Purchase orders (increase stock on lines with productId); distributions decrease stock",
+		)
 		.addTag(SwaggerTags.ErpCurrencyExchanges, "FX desk operations")
-		.addTag(SwaggerTags.ErpInventoryTransfers, "Inter-location stock transfers")
+		.addTag(
+			SwaggerTags.ErpInventoryTransfers,
+			"Transfers between centers/vehicles; completing a transfer decreases product stock",
+		)
 		.addTag(SwaggerTags.ErpCashHandovers, "Cash handovers between roles / centers")
 		.build();
 
@@ -97,17 +118,20 @@ export function logOpenApiProductPaths(document: OpenAPIObject): void {
 		p.includes("/products"),
 	);
 	const highlights = productPaths.filter(
-		(p) => p.includes("bulk") || p.includes("seed"),
+		(p) =>
+			p.includes("bulk") ||
+			p.includes("seed") ||
+			p.includes("/stock/"),
 	);
 	console.log(
 		`[Swagger] ${productPaths.length} /products/* path(s):`,
 		productPaths.join(", ") || "(none)",
 	);
 	if (highlights.length) {
-		console.log(`[Swagger] bulk/seed routes: ${highlights.join(", ")}`);
+		console.log(`[Swagger] product highlights: ${highlights.join(", ")}`);
 	} else {
 		console.warn(
-			"[Swagger] WARNING: POST /products/bulk or /products/seed/oil-catalog missing — rebuild and restart the API",
+			"[Swagger] WARNING: expected /products/bulk, /products/seed/oil-catalog, or /stock/* routes missing — rebuild and restart",
 		);
 	}
 }

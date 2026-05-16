@@ -2,6 +2,9 @@ import { CreateProductDto } from "src/products/dto/create-product.dto";
 
 type OilCatalogRow = Omit<CreateProductDto, "stock">;
 
+/** Default stock for every oil-catalog SKU on seed / bulk upsert */
+export const OIL_CATALOG_DEFAULT_STOCK = 500;
+
 const OIL_CATALOG_ROWS: OilCatalogRow[] = [
 	{
 		name: "0/20 4 لتر تنك",
@@ -293,5 +296,5 @@ const OIL_CATALOG_ROWS: OilCatalogRow[] = [
 
 /** Default oil product catalog — upserted by POST /products/seed/oil-catalog */
 export const OIL_CATALOG_PRODUCTS: CreateProductDto[] = OIL_CATALOG_ROWS.map(
-	(row) => ({ ...row, stock: 500 }),
+	(row) => ({ ...row, stock: OIL_CATALOG_DEFAULT_STOCK }),
 );

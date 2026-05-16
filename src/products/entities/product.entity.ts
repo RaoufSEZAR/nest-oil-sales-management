@@ -37,7 +37,10 @@ export class Product {
 	@Column({ type: "decimal", precision: 10, scale: 2 })
 	price: string;
 
-	@ApiProperty({ description: "Available stock quantity" })
+	@ApiProperty({
+		description: "Available catalog / warehouse stock quantity",
+		example: "500.00",
+	})
 	@Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
 	stock: string;
 

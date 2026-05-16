@@ -40,7 +40,11 @@ export class CreateProductDto {
 	@Min(0)
 	price: number;
 
-	@ApiProperty({ description: "Initial / catalog stock quantity" })
+	@ApiProperty({
+		description: "Available stock quantity (required)",
+		minimum: 0,
+		example: 500,
+	})
 	@Type(() => Number)
 	@IsNumber()
 	@Min(0)

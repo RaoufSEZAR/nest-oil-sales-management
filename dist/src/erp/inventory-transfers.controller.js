@@ -63,7 +63,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: "Create transfer with line items" }),
+    (0, swagger_1.ApiOperation)({
+        summary: "Create transfer with line items",
+        description: "If status is **completed** on create, decreases **product stock** per line immediately.",
+    }),
     openapi.ApiResponse({ status: 201, type: require("./entities/inventory-transfer.entity").InventoryTransfer }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -73,7 +76,10 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(":id"),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: "Update transfer status / receiver" }),
+    (0, swagger_1.ApiOperation)({
+        summary: "Update transfer status / receiver",
+        description: "When status changes to **completed**, decreases **product stock** for each line (once).",
+    }),
     openapi.ApiResponse({ status: 200, type: require("./entities/inventory-transfer.entity").InventoryTransfer }),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),

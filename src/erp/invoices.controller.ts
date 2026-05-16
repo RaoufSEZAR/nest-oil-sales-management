@@ -39,7 +39,11 @@ export class ErpInvoicesController {
 
 	@Post()
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-	@ApiOperation({ summary: "Create invoice (numbered via sequences)" })
+	@ApiOperation({
+		summary: "Create invoice (numbered via sequences)",
+		description:
+			"Decreases **product stock** by each line item quantity. Fails with **400** if stock is insufficient.",
+	})
 	create(@Body() dto: CreateInvoiceDto) {
 		return this.invoices.create(dto);
 	}

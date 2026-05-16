@@ -21,7 +21,11 @@ class AdjustProductStockDto {
 }
 exports.AdjustProductStockDto = AdjustProductStockDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: "Quantity to add or remove", minimum: 0 }),
+    (0, swagger_1.ApiProperty)({
+        description: "Units to add (increase) or remove (decrease); must be > 0",
+        minimum: 0,
+        example: 10,
+    }),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(0),

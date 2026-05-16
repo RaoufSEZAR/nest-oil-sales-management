@@ -51,7 +51,10 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "price", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: "Available stock quantity" }),
+    (0, swagger_1.ApiProperty)({
+        description: "Available catalog / warehouse stock quantity",
+        example: "500.00",
+    }),
     (0, typeorm_1.Column)({ type: "decimal", precision: 10, scale: 2, default: 0 }),
     __metadata("design:type", String)
 ], Product.prototype, "stock", void 0);

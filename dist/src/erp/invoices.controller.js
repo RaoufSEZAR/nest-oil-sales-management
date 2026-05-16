@@ -60,7 +60,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: "Create invoice (numbered via sequences)" }),
+    (0, swagger_1.ApiOperation)({
+        summary: "Create invoice (numbered via sequences)",
+        description: "Decreases **product stock** by each line item quantity. Fails with **400** if stock is insufficient.",
+    }),
     openapi.ApiResponse({ status: 201, type: require("./entities/invoice.entity").Invoice }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

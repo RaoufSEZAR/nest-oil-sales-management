@@ -60,7 +60,10 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
-    (0, swagger_1.ApiOperation)({ summary: "Create sales return" }),
+    (0, swagger_1.ApiOperation)({
+        summary: "Create sales return",
+        description: "Increases **product stock** by each return line quantity.",
+    }),
     openapi.ApiResponse({ status: 201, type: require("./entities/sales-return.entity").SalesReturn }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

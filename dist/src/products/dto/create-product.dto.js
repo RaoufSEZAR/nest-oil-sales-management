@@ -56,7 +56,11 @@ __decorate([
     __metadata("design:type", Number)
 ], CreateProductDto.prototype, "price", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ description: "Initial / catalog stock quantity" }),
+    (0, swagger_1.ApiProperty)({
+        description: "Available stock quantity (required)",
+        minimum: 0,
+        example: 500,
+    }),
     (0, class_transformer_1.Type)(() => Number),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(0),

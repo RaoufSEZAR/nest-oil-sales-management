@@ -44,7 +44,11 @@ export class ErpPurchasesController {
 
 	@Post()
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-	@ApiOperation({ summary: "Create purchase with line items" })
+	@ApiOperation({
+		summary: "Create purchase with line items",
+		description:
+			"Increases **product stock** for each line that includes a `productId`.",
+	})
 	create(@Body() dto: CreatePurchaseDto) {
 		return this.purchases.create(dto);
 	}
@@ -61,7 +65,11 @@ export class ErpPurchasesController {
 
 	@Post(":id/distributions")
 	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-	@ApiOperation({ summary: "Record stock distribution for a purchase" })
+	@ApiOperation({
+		summary: "Record stock distribution for a purchase",
+		description:
+			"Decreases **product stock** by the distributed quantity when sending stock to a center.",
+	})
 	addDistribution(
 		@Param("id", ParseIntPipe) id: number,
 		@Body() dto: CreatePurchaseDistributionDto,

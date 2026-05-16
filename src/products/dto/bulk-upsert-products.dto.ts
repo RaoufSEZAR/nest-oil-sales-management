@@ -10,7 +10,12 @@ import {
 import { CreateProductDto } from "src/products/dto/create-product.dto";
 
 export class BulkUpsertProductsDto {
-	@ApiProperty({ type: CreateProductDto, isArray: true })
+	@ApiProperty({
+		type: CreateProductDto,
+		isArray: true,
+		description:
+			"Each entry must include required **stock** (see CreateProductDto).",
+	})
 	@IsArray()
 	@ArrayMinSize(1)
 	@ValidateNested({ each: true })

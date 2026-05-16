@@ -22,7 +22,11 @@ class BulkUpsertProductsDto {
 }
 exports.BulkUpsertProductsDto = BulkUpsertProductsDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: create_product_dto_1.CreateProductDto, isArray: true }),
+    (0, swagger_1.ApiProperty)({
+        type: create_product_dto_1.CreateProductDto,
+        isArray: true,
+        description: "Each entry must include required **stock** (see CreateProductDto).",
+    }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ArrayMinSize)(1),
     (0, class_validator_1.ValidateNested)({ each: true }),
