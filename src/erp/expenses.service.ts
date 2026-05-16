@@ -7,6 +7,7 @@ import { CreateExpenseDto } from "src/erp/dto/documents.dto";
 import { SequenceService } from "src/erp/sequence.service";
 import { TradeCurrency } from "src/erp/enums/trade-currency.enum";
 import { User } from "src/users/entities/user.entity";
+import { ErpExpenseCategoriesService } from "src/erp/expense-categories.service";
 
 function dec4(n: number): string {
 	return n.toFixed(4);
@@ -18,6 +19,7 @@ export class ErpExpensesService {
 		@InjectRepository(Expense)
 		private readonly repo: Repository<Expense>,
 		private readonly sequences: SequenceService,
+		private readonly expenseCategories: ErpExpenseCategoriesService,
 	) {}
 
 	findAll(filters?: {
@@ -40,12 +42,7 @@ export class ErpExpensesService {
 	}
 
 	async getCategories(): Promise<string[]> {
-		const rows = await this.repo
-			.createQueryBuilder("e")
-			.select("DISTINCT e.category", "category")
-			.orderBy("e.category", "ASC")
-			.getRawMany<{ category: string }>();
-		return rows.map((r) => r.category);
+		return this.expenseCategories.getActiveNames();
 	}
 
 	async remove(id: number): Promise<void> {

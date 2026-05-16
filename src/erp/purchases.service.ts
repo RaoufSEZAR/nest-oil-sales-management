@@ -71,7 +71,17 @@ export class ErpPurchasesService {
 			linesTotal += line.quantity * line.unitPriceUsd;
 		}
 		const totalAmount = linesTotal + customs + shipping;
-		const amountUsd = totalAmount * exchangeRate;
+		const paidOrig = dto.paidAmount ?? 0;
+		const paidUsd = currency === TradeCurrency.USD ? paidOrig : paidOrig / exchangeRate;
+
+		let paymentStatus = PurchasePaymentStatus.UNPAID;
+		if (paidUsd > 0.01 && paidUsd < totalAmount - 0.01) {
+			paymentStatus = PurchasePaymentStatus.PARTIAL;
+		} else if (paidUsd >= totalAmount - 0.01 && totalAmount > 0) {
+			paymentStatus = PurchasePaymentStatus.PAID;
+		}
+
+		const purchaseType = dto.purchaseType ?? "center";
 
 		return this.dataSource.transaction(async (em) => {
 			const purchaseNumber = await this.sequences.next("PO");
@@ -82,10 +92,14 @@ export class ErpPurchasesService {
 				supplierPhone: dto.supplierPhone ?? null,
 				date: dto.date.slice(0, 10),
 				totalAmount: dec4(totalAmount),
-				paidAmount: "0",
+				paidAmount: dec4(paidOrig),
 				currency,
 				exchangeRate: dec4(exchangeRate),
-				amountUsd: dec4(amountUsd),
+				amountUsd: dec4(totalAmount * exchangeRate),
+				paymentStatus,
+				purchaseType,
+				distributionStatus:
+					purchaseType === "main" ? "pending" : null,
 				createdBy: { id: dto.createdById } as User,
 				customsCost: dec4(customs),
 				shippingCost: dec4(shipping),
@@ -152,7 +166,35 @@ export class ErpPurchasesService {
 		});
 		const saved = await this.distributions.save(entity);
 		await this.productsService.decreaseStock(dto.productId, dto.quantity);
+		await this.syncDistributionStatus(purchaseId);
 		return saved;
+	}
+
+	private async syncDistributionStatus(purchaseId: number): Promise<void> {
+		const row = await this.findOne(purchaseId);
+		if (row.purchaseType !== "main") return;
+
+		const items = row.items ?? [];
+		const dists = row.distributions ?? [];
+		if (!items.length) {
+			row.distributionStatus = "pending";
+		} else {
+			let fully = true;
+			let any = dists.length > 0;
+			for (const item of items) {
+				if (!item.product?.id) continue;
+				const ordered = parseFloat(item.quantity || "0");
+				const sent = dists
+					.filter((d) => d.product?.id === item.product?.id)
+					.reduce((s, d) => s + parseFloat(d.quantity || "0"), 0);
+				if (sent < ordered - 0.0001) fully = false;
+				if (sent > 0) any = true;
+			}
+			if (fully && any) row.distributionStatus = "distributed";
+			else if (any) row.distributionStatus = "partial";
+			else row.distributionStatus = "pending";
+		}
+		await this.purchases.save(row);
 	}
 
 	async confirmReceipt(id: number, confirmedById: string): Promise<Purchase> {

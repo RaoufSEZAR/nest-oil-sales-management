@@ -18,6 +18,7 @@ const return_item_entity_1 = require("./entities/return-item.entity");
 const payment_entity_1 = require("./entities/payment.entity");
 const vehicle_trip_entity_1 = require("./entities/vehicle-trip.entity");
 const expense_entity_1 = require("./entities/expense.entity");
+const expense_category_entity_1 = require("./entities/expense-category.entity");
 const purchase_entity_1 = require("./entities/purchase.entity");
 const purchase_item_entity_1 = require("./entities/purchase-item.entity");
 const purchase_distribution_entity_1 = require("./entities/purchase-distribution.entity");
@@ -41,6 +42,8 @@ const vehicle_trips_service_1 = require("./vehicle-trips.service");
 const vehicle_trips_controller_1 = require("./vehicle-trips.controller");
 const expenses_service_1 = require("./expenses.service");
 const expenses_controller_1 = require("./expenses.controller");
+const expense_categories_service_1 = require("./expense-categories.service");
+const expense_categories_controller_1 = require("./expense-categories.controller");
 const purchases_service_1 = require("./purchases.service");
 const purchases_controller_1 = require("./purchases.controller");
 const currency_exchanges_service_1 = require("./currency-exchanges.service");
@@ -68,6 +71,7 @@ const erpEntities = [
     payment_entity_1.Payment,
     vehicle_trip_entity_1.VehicleTrip,
     expense_entity_1.Expense,
+    expense_category_entity_1.ExpenseCategory,
     purchase_entity_1.Purchase,
     purchase_item_entity_1.PurchaseItem,
     purchase_distribution_entity_1.PurchaseDistribution,
@@ -93,6 +97,7 @@ exports.ErpModule = ErpModule = __decorate([
             payments_controller_1.ErpPaymentsController,
             vehicle_trips_controller_1.ErpVehicleTripsController,
             expenses_controller_1.ErpExpensesController,
+            expense_categories_controller_1.ErpExpenseCategoriesController,
             purchases_controller_1.ErpPurchasesController,
             currency_exchanges_controller_1.ErpCurrencyExchangesController,
             inventory_transfers_controller_1.ErpInventoryTransfersController,
@@ -112,6 +117,7 @@ exports.ErpModule = ErpModule = __decorate([
             payments_service_1.ErpPaymentsService,
             vehicle_trips_service_1.ErpVehicleTripsService,
             expenses_service_1.ErpExpensesService,
+            expense_categories_service_1.ErpExpenseCategoriesService,
             purchases_service_1.ErpPurchasesService,
             currency_exchanges_service_1.ErpCurrencyExchangesService,
             inventory_transfers_service_1.ErpInventoryTransfersService,

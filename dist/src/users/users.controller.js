@@ -144,7 +144,7 @@ __decorate([
 ], UsersController.prototype, "findByCenter", null);
 __decorate([
     (0, common_1.Get)("hr/settings"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
     (0, swagger_1.ApiOperation)({ summary: "HR settings for all active users (legacy)" }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/user.entity").User] }),
     __metadata("design:type", Function),
@@ -153,7 +153,7 @@ __decorate([
 ], UsersController.prototype, "getHrSettings", null);
 __decorate([
     (0, common_1.Get)("hr/payroll/:month"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
     (0, swagger_1.ApiOperation)({ summary: "Monthly payroll report (legacy)" }),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("month")),
@@ -241,7 +241,7 @@ __decorate([
 ], UsersController.prototype, "unassign", null);
 __decorate([
     (0, common_1.Put)(":id/hr-settings"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.USER_MANAGEMENT_ROLES),
     (0, swagger_1.ApiOperation)({ summary: "Update HR settings for a user (legacy)" }),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),

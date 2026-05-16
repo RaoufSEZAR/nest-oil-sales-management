@@ -61,7 +61,7 @@ export class ErpExpensesController {
 	}
 
 	@Post()
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({ summary: "Create expense" })
 	create(@Body() dto: CreateExpenseDto) {
 		return this.expenses.create(dto);

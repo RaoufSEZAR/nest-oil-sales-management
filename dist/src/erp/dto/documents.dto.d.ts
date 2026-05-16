@@ -96,6 +96,8 @@ export declare class CreatePurchaseDto {
     customsCost?: number;
     shippingCost?: number;
     notes?: string;
+    purchaseType?: string;
+    paidAmount?: number;
 }
 export declare class CreateCurrencyExchangeDto {
     centerId: number;

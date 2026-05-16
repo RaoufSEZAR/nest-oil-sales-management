@@ -23,18 +23,20 @@ export class HrService {
 	getHrSettings() {
 		return this.users.find({
 			where: { isActive: true },
-			select: [
-				"id",
-				"firstName",
-				"lastName",
-				"phoneNumber",
-				"role",
-				"centerId",
-				"isActive",
-				"baseSalary",
-				"commissionRate",
-				"commissionBasis",
-			],
+			relations: { center: true },
+			select: {
+				id: true,
+				firstName: true,
+				lastName: true,
+				phoneNumber: true,
+				role: true,
+				centerId: true,
+				isActive: true,
+				baseSalary: true,
+				commissionRate: true,
+				commissionBasis: true,
+				center: { id: true, name: true, code: true },
+			},
 			order: { firstName: "ASC", lastName: "ASC" },
 		});
 	}

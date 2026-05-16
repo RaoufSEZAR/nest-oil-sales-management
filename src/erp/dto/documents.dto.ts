@@ -393,6 +393,18 @@ export class CreatePurchaseDto {
 	@IsOptional()
 	@IsString()
 	notes?: string;
+
+	@ApiPropertyOptional({ example: "main" })
+	@IsOptional()
+	@IsString()
+	@MaxLength(20)
+	purchaseType?: string;
+
+	@ApiPropertyOptional()
+	@IsOptional()
+	@IsNumber({ maxDecimalPlaces: 4 })
+	@Type(() => Number)
+	paidAmount?: number;
 }
 
 export class CreateCurrencyExchangeDto {

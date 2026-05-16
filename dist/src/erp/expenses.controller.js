@@ -87,7 +87,7 @@ __decorate([
 ], ErpExpensesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "Create expense" }),
     openapi.ApiResponse({ status: 201, type: require("./entities/expense.entity").Expense }),
     __param(0, (0, common_1.Body)()),

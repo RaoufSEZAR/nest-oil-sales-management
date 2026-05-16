@@ -50,7 +50,7 @@ export class CentersController {
 	}
 
 	@Post()
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({ summary: "Create center" })
 	create(@Body() dto: CreateCenterDto) {
 		return this.centersService.create(dto);
@@ -89,7 +89,7 @@ export class CentersController {
 	}
 
 	@Patch(":id")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({ summary: "Update center" })
 	update(
 		@Param("id", ParseIntPipe) id: number,
@@ -99,7 +99,7 @@ export class CentersController {
 	}
 
 	@Put(":id")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({ summary: "Update center (legacy PUT)" })
 	updatePut(
 		@Param("id", ParseIntPipe) id: number,

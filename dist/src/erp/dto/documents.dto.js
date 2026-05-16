@@ -434,7 +434,7 @@ __decorate([
 ], PurchaseLineDto.prototype, "unitPriceUsd", void 0);
 class CreatePurchaseDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { centerId: { required: false, type: () => Number }, supplierName: { required: true, type: () => String, maxLength: 150 }, supplierPhone: { required: false, type: () => String, maxLength: 30 }, date: { required: true, type: () => String }, currency: { required: false, enum: require("../enums/trade-currency.enum").TradeCurrency }, exchangeRate: { required: false, type: () => Number }, createdById: { required: true, type: () => String, format: "uuid" }, items: { required: true, type: () => [require("./documents.dto").PurchaseLineDto] }, customsCost: { required: false, type: () => Number }, shippingCost: { required: false, type: () => Number }, notes: { required: false, type: () => String } };
+        return { centerId: { required: false, type: () => Number }, supplierName: { required: true, type: () => String, maxLength: 150 }, supplierPhone: { required: false, type: () => String, maxLength: 30 }, date: { required: true, type: () => String }, currency: { required: false, enum: require("../enums/trade-currency.enum").TradeCurrency }, exchangeRate: { required: false, type: () => Number }, createdById: { required: true, type: () => String, format: "uuid" }, items: { required: true, type: () => [require("./documents.dto").PurchaseLineDto] }, customsCost: { required: false, type: () => Number }, shippingCost: { required: false, type: () => Number }, notes: { required: false, type: () => String }, purchaseType: { required: false, type: () => String, maxLength: 20 }, paidAmount: { required: false, type: () => Number } };
     }
 }
 exports.CreatePurchaseDto = CreatePurchaseDto;
@@ -507,6 +507,20 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreatePurchaseDto.prototype, "notes", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: "main" }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(20),
+    __metadata("design:type", String)
+], CreatePurchaseDto.prototype, "purchaseType", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)({ maxDecimalPlaces: 4 }),
+    (0, class_transformer_1.Type)(() => Number),
+    __metadata("design:type", Number)
+], CreatePurchaseDto.prototype, "paidAmount", void 0);
 class CreateCurrencyExchangeDto {
     static _OPENAPI_METADATA_FACTORY() {
         return { centerId: { required: true, type: () => Number }, fromCurrency: { required: true, enum: require("../enums/trade-currency.enum").TradeCurrency }, fromAmount: { required: true, type: () => Number }, fromAmountUsd: { required: true, type: () => Number }, toCurrency: { required: true, enum: require("../enums/trade-currency.enum").TradeCurrency }, toAmount: { required: true, type: () => Number }, toAmountUsd: { required: true, type: () => Number }, exchangeRate: { required: true, type: () => Number }, fromWeightedRate: { required: false, type: () => Number }, toWeightedRate: { required: false, type: () => Number }, differenceUsd: { required: false, type: () => Number }, notes: { required: false, type: () => String }, createdById: { required: true, type: () => String, format: "uuid" } };

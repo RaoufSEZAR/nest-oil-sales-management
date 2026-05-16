@@ -77,14 +77,14 @@ export class UsersController {
 	}
 
 	@Get("hr/settings")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(...USER_MANAGEMENT_ROLES)
 	@ApiOperation({ summary: "HR settings for all active users (legacy)" })
 	getHrSettings() {
 		return this.hrService.getHrSettings();
 	}
 
 	@Get("hr/payroll/:month")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(...USER_MANAGEMENT_ROLES)
 	@ApiOperation({ summary: "Monthly payroll report (legacy)" })
 	getMonthlyPayroll(@Param("month") month: string) {
 		return this.hrService.getMonthlyPayroll(month);
@@ -173,7 +173,7 @@ export class UsersController {
 	}
 
 	@Put(":id/hr-settings")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(...USER_MANAGEMENT_ROLES)
 	@ApiOperation({ summary: "Update HR settings for a user (legacy)" })
 	updateHrSettings(
 		@Param("id") id: string,

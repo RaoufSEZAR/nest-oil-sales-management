@@ -55,7 +55,6 @@ let ErpPurchasesController = class ErpPurchasesController {
 exports.ErpPurchasesController = ErpPurchasesController;
 __decorate([
     (0, common_1.Get)(),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "List purchases" }),
     openapi.ApiResponse({ status: 200, type: [require("./entities/purchase.entity").Purchase] }),
     __metadata("design:type", Function),
@@ -64,7 +63,6 @@ __decorate([
 ], ErpPurchasesController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(":id"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "Get purchase by id" }),
     openapi.ApiResponse({ status: 200, type: require("./entities/purchase.entity").Purchase }),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
@@ -74,7 +72,6 @@ __decorate([
 ], ErpPurchasesController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiOperation)({
         summary: "Create purchase with line items",
         description: "Increases **product stock** for each line that includes a `productId`.",
@@ -98,7 +95,7 @@ __decorate([
 ], ErpPurchasesController.prototype, "update", null);
 __decorate([
     (0, common_1.Post)(":id/distributions"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({
         summary: "Record stock distribution for a purchase",
         description: "Decreases **product stock** by the distributed quantity when sending stock to a center.",
@@ -135,7 +132,6 @@ __decorate([
 ], ErpPurchasesController.prototype, "rejectReceipt", null);
 __decorate([
     (0, common_1.Patch)(":id/payment"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
     (0, swagger_1.ApiOperation)({ summary: "Update purchase payment (legacy)" }),
     openapi.ApiResponse({ status: 200, type: require("./entities/purchase.entity").Purchase }),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
@@ -148,6 +144,7 @@ exports.ErpPurchasesController = ErpPurchasesController = __decorate([
     (0, swagger_1.ApiTags)(api_tags_1.SwaggerTags.ErpPurchases),
     (0, common_1.Controller)("purchases"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)(...user_role_enum_1.ERP_MANAGEMENT_ROLES),
     (0, swagger_1.ApiBearerAuth)(),
     __metadata("design:paramtypes", [purchases_service_1.ErpPurchasesService])
 ], ErpPurchasesController);

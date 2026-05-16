@@ -139,7 +139,7 @@ export class ProductsController {
 	}
 
 	@Post()
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({
 		summary: "Create product",
 		description: "Requires **`stock`** alongside name, sku, and price.",
@@ -165,7 +165,7 @@ export class ProductsController {
 	}
 
 	@Patch(":id/stock/increase")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({
 		summary: "Increase product stock",
 		description: "Adds `quantity` to the product's **`stock`** field.",
@@ -182,7 +182,7 @@ export class ProductsController {
 	}
 
 	@Patch(":id/stock/decrease")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({
 		summary: "Decrease product stock",
 		description:
@@ -202,7 +202,7 @@ export class ProductsController {
 	}
 
 	@Patch(":id")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({
 		summary: "Update product",
 		description:
@@ -216,7 +216,7 @@ export class ProductsController {
 	}
 
 	@Put(":id")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({ summary: "Update product (legacy PUT)" })
 	updatePut(
 		@Param("id", ParseIntPipe) id: number,
@@ -226,7 +226,7 @@ export class ProductsController {
 	}
 
 	@Delete(":id")
-	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+	@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER)
 	@ApiOperation({
 		summary: "Deactivate product (legacy delete = soft delete)",
 	})

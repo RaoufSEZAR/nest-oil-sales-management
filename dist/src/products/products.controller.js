@@ -161,7 +161,7 @@ __decorate([
 ], ProductsController.prototype, "seedOilCatalog", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({
         summary: "Create product",
         description: "Requires **`stock`** alongside name, sku, and price.",
@@ -192,7 +192,7 @@ __decorate([
 ], ProductsController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(":id/stock/increase"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({
         summary: "Increase product stock",
         description: "Adds `quantity` to the product's **`stock`** field.",
@@ -210,7 +210,7 @@ __decorate([
 ], ProductsController.prototype, "increaseStock", null);
 __decorate([
     (0, common_1.Patch)(":id/stock/decrease"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({
         summary: "Decrease product stock",
         description: "Subtracts `quantity` from **`stock`**. Returns **400** if stock would go negative.",
@@ -230,7 +230,7 @@ __decorate([
 ], ProductsController.prototype, "decreaseStock", null);
 __decorate([
     (0, common_1.Patch)(":id"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({
         summary: "Update product",
         description: "Partial update; include **`stock`** to set absolute quantity (not a delta).",
@@ -244,7 +244,7 @@ __decorate([
 ], ProductsController.prototype, "update", null);
 __decorate([
     (0, common_1.Put)(":id"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({ summary: "Update product (legacy PUT)" }),
     openapi.ApiResponse({ status: 200, type: require("./entities/product.entity").Product }),
     __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
@@ -255,7 +255,7 @@ __decorate([
 ], ProductsController.prototype, "updatePut", null);
 __decorate([
     (0, common_1.Delete)(":id"),
-    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN),
+    (0, roles_decorator_1.Roles)(user_role_enum_1.UserRole.ADMIN, user_role_enum_1.UserRole.SUPER_ADMIN, user_role_enum_1.UserRole.MANAGER),
     (0, swagger_1.ApiOperation)({
         summary: "Deactivate product (legacy delete = soft delete)",
     }),

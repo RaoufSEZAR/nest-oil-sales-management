@@ -9,6 +9,7 @@ import { ReturnItem } from "src/erp/entities/return-item.entity";
 import { Payment } from "src/erp/entities/payment.entity";
 import { VehicleTrip } from "src/erp/entities/vehicle-trip.entity";
 import { Expense } from "src/erp/entities/expense.entity";
+import { ExpenseCategory } from "src/erp/entities/expense-category.entity";
 import { Purchase } from "src/erp/entities/purchase.entity";
 import { PurchaseItem } from "src/erp/entities/purchase-item.entity";
 import { PurchaseDistribution } from "src/erp/entities/purchase-distribution.entity";
@@ -32,6 +33,8 @@ import { ErpVehicleTripsService } from "src/erp/vehicle-trips.service";
 import { ErpVehicleTripsController } from "src/erp/vehicle-trips.controller";
 import { ErpExpensesService } from "src/erp/expenses.service";
 import { ErpExpensesController } from "src/erp/expenses.controller";
+import { ErpExpenseCategoriesService } from "src/erp/expense-categories.service";
+import { ErpExpenseCategoriesController } from "src/erp/expense-categories.controller";
 import { ErpPurchasesService } from "src/erp/purchases.service";
 import { ErpPurchasesController } from "src/erp/purchases.controller";
 import { ErpCurrencyExchangesService } from "src/erp/currency-exchanges.service";
@@ -60,6 +63,7 @@ const erpEntities = [
 	Payment,
 	VehicleTrip,
 	Expense,
+	ExpenseCategory,
 	Purchase,
 	PurchaseItem,
 	PurchaseDistribution,
@@ -82,6 +86,7 @@ const erpEntities = [
 		ErpPaymentsController,
 		ErpVehicleTripsController,
 		ErpExpensesController,
+		ErpExpenseCategoriesController,
 		ErpPurchasesController,
 		ErpCurrencyExchangesController,
 		ErpInventoryTransfersController,
@@ -101,6 +106,7 @@ const erpEntities = [
 		ErpPaymentsService,
 		ErpVehicleTripsService,
 		ErpExpensesService,
+		ErpExpenseCategoriesService,
 		ErpPurchasesService,
 		ErpCurrencyExchangesService,
 		ErpInventoryTransfersService,

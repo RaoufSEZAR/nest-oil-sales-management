@@ -20,13 +20,15 @@ const query_filters_1 = require("../common/utils/query-filters");
 const expense_entity_1 = require("./entities/expense.entity");
 const sequence_service_1 = require("./sequence.service");
 const trade_currency_enum_1 = require("./enums/trade-currency.enum");
+const expense_categories_service_1 = require("./expense-categories.service");
 function dec4(n) {
     return n.toFixed(4);
 }
 let ErpExpensesService = class ErpExpensesService {
-    constructor(repo, sequences) {
+    constructor(repo, sequences, expenseCategories) {
         this.repo = repo;
         this.sequences = sequences;
+        this.expenseCategories = expenseCategories;
     }
     findAll(filters) {
         const where = {};
@@ -44,12 +46,7 @@ let ErpExpensesService = class ErpExpensesService {
         });
     }
     async getCategories() {
-        const rows = await this.repo
-            .createQueryBuilder("e")
-            .select("DISTINCT e.category", "category")
-            .orderBy("e.category", "ASC")
-            .getRawMany();
-        return rows.map((r) => r.category);
+        return this.expenseCategories.getActiveNames();
     }
     async remove(id) {
         await this.findOne(id);
@@ -90,6 +87,7 @@ exports.ErpExpensesService = ErpExpensesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(expense_entity_1.Expense)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
-        sequence_service_1.SequenceService])
+        sequence_service_1.SequenceService,
+        expense_categories_service_1.ErpExpenseCategoriesService])
 ], ErpExpensesService);
 //# sourceMappingURL=expenses.service.js.map
