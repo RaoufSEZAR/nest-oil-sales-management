@@ -110,18 +110,55 @@ In the Web Service → **Environment** → add:
 | `JWT_SECRET` | Long random string (≥ 32 chars). Generate: `openssl rand -base64 48` |
 | `JWT_EXPIRES_IN` | `24h` (or `15m` for stricter access tokens) |
 
-### Copy-paste template (replace placeholders)
+### Your Render Postgres URLs
+
+| Use case | Connection |
+|----------|------------|
+| **API on Render** (Web Service env vars) | Internal URL / internal host |
+| **Your PC** (psql, pgAdmin, schema import) | External URL |
+
+**Internal** (Web Service on Render):
+
+```text
+postgresql://oil_sales_db_user:Cwjq8c1YE0CSsjDDX4iQ8M4Wuan7urSu@dpg-d84dmvmgvqtc7382cu80-a/oil_sales_db
+```
+
+**External** (local machine):
+
+```text
+postgresql://oil_sales_db_user:Cwjq8c1YE0CSsjDDX4iQ8M4Wuan7urSu@dpg-d84dmvmgvqtc7382cu80-a.oregon-postgres.render.com/oil_sales_db
+```
+
+The BK app does **not** read `DATABASE_URL`; split the URL into `DB_*` variables below.
+
+### Copy-paste for your Render Web Service
+
+Use **internal** host (no `.oregon-postgres.render.com` suffix):
 
 ```env
 NODE_ENV=production
-DB_HOST=dpg-xxxxxxxxxxxx-a.REGION-postgres.render.com
+DB_HOST=dpg-d84dmvmgvqtc7382cu80-a
 DB_PORT=5432
-DB_USERNAME=your_db_user
-DB_PASSWORD=your_db_password
-DB_NAME=oil_sales_app
+DB_USERNAME=oil_sales_db_user
+DB_PASSWORD=Cwjq8c1YE0CSsjDDX4iQ8M4Wuan7urSu
+DB_NAME=oil_sales_db
 DB_SSL=true
-JWT_SECRET=REPLACE_WITH_LONG_RANDOM_SECRET
+JWT_SECRET=<generate: openssl rand -base64 48>
 JWT_EXPIRES_IN=24h
+```
+
+Do **not** commit `DB_PASSWORD` or `JWT_SECRET` to a public repo. Set them in the Render dashboard only.
+
+### Connect from your PC (schema import / psql)
+
+```bash
+psql "postgresql://oil_sales_db_user:Cwjq8c1YE0CSsjDDX4iQ8M4Wuan7urSu@dpg-d84dmvmgvqtc7382cu80-a.oregon-postgres.render.com/oil_sales_db?sslmode=require"
+```
+
+Or export local DB and import:
+
+```bash
+pg_dump -h localhost -p 5433 -U postgres -d oil-sales-app --no-owner --no-acl | psql "postgresql://oil_sales_db_user:Cwjq8c1YE0CSsjDDX4iQ8M4Wuan7urSu@dpg-d84dmvmgvqtc7382cu80-a.oregon-postgres.render.com/oil_sales_db?sslmode=require"
 ```
 
 **Link database (optional):** In the Web Service, use **Add from Render PostgreSQL** to attach the DB; Render can inject connection variables. Rename them to match `DB_HOST`, `DB_USERNAME`, etc., if Render uses different key names (e.g. map `DATABASE_URL` manually or split into the fields above).
