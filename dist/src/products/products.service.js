@@ -118,6 +118,9 @@ let ProductsService = class ProductsService {
         return result;
     }
     async increaseStock(productId, quantity, em) {
+        if (quantity <= 0) {
+            throw new common_1.BadRequestException("quantity must be greater than 0");
+        }
         return this.applyStockDelta(productId, quantity, em);
     }
     async decreaseStock(productId, quantity, em) {
