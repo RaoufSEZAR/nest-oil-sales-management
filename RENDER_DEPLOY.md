@@ -148,6 +148,24 @@ Do **not** commit `DB_PASSWORD` or `JWT_SECRET` to a public repo. Set them in th
 
 Optional after DB is stable: `DB_SYNCHRONIZE=false`
 
+### First login (empty database)
+
+Production Postgres has **no users** until you create one. Use Swagger or curl:
+
+`POST /api/v1/auth/register`
+
+```json
+{
+  "email": "your@email.com",
+  "password": "YourPassword123",
+  "firstName": "Manager",
+  "lastName": "User",
+  "role": "manager"
+}
+```
+
+Then log in with the same email and password at `POST /api/v1/auth/login`.
+
 ### Connect from your PC (schema import / psql)
 
 ```bash
@@ -296,7 +314,8 @@ docker run --rm -p 3000:3000 \
 | `Access denied. Required roles: ...` | Redeploy latest image; ensure code includes `MANAGER` on ERP routes. |
 | DB connection timeout | `DB_SSL=true`, correct host/port, Postgres and Web Service in same region. |
 | App crashes on start | Logs for TypeORM/auth; missing `JWT_SECRET` or DB vars. |
-| `42P01` / crash on deploy / empty tables | Add `DB_SYNCHRONIZE=true`, redeploy, then set `false`; see **Step 4**. |
+| `42P01` / crash on deploy / empty tables | Push latest code (schema sync on by default); see **Step 4**. |
+| Login `401 Invalid credentials` | No user in production DB, or wrong password; use `/auth/register` or import users. |
 | 502 on free tier | Cold start; wait 30–60s or upgrade plan. |
 | CORS errors from browser | API URL must include `/api/v1`; FE must use HTTPS in production. |
 

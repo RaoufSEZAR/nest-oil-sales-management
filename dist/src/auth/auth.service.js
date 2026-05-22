@@ -21,8 +21,10 @@ let AuthService = class AuthService {
     }
     async validateUser(email, password) {
         const user = await this.usersService.findByEmail(email);
-        if (user && await bcrypt.compare(password, user.password)) {
-            const { password, ...result } = user;
+        if (!user || !user.isActive)
+            return null;
+        if (await bcrypt.compare(password, user.password)) {
+            const { password: _pw, ...result } = user;
             return result;
         }
         return null;
@@ -52,12 +54,9 @@ let AuthService = class AuthService {
         return this.generateTokens(user);
     }
     async register(createUserDto) {
-        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-        const user = await this.usersService.create({
-            ...createUserDto,
-            password: hashedPassword,
-        });
-        return this.generateTokens(user);
+        const user = await this.usersService.create(createUserDto);
+        const { password: _pw, ...safe } = user;
+        return this.generateTokens(safe);
     }
     generateTokens(user) {
         const payload = { email: user.email, sub: user.id, role: user.role };

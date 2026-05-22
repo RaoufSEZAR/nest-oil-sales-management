@@ -15,8 +15,9 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password, ...result } = user;
+    if (!user || !user.isActive) return null;
+    if (await bcrypt.compare(password, user.password)) {
+      const { password: _pw, ...result } = user;
       return result;
     }
     return null;
@@ -49,13 +50,9 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = await this.usersService.create({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-
-    return this.generateTokens(user);
+    const user = await this.usersService.create(createUserDto);
+    const { password: _pw, ...safe } = user;
+    return this.generateTokens(safe);
   }
 
   private generateTokens(user: any): AuthResponseDto {
